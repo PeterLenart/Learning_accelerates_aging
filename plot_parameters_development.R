@@ -14,7 +14,7 @@ dir <- "C:\\Users\\example\\desktop\\work\\parameters\\"
 files <- list.files(dir)
 
 files <- grep("parameters", files, value = TRUE, invert = FALSE)
-files <- grep("gm", files, value = TRUE, invert = TRUE)
+files <- grep("gm", files, value = TRUE, invert = TRUE)  # In case you want to plot development of parameters from GM model - set invert to FALSE
 
 # Iterate over the list of files and open each one
 for (file in files) {
