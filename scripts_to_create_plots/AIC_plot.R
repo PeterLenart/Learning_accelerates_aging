@@ -74,7 +74,7 @@ common_theme <- function() {
 }
 
 
-# create a jitter plot
+# # create a jitter plot of GLA and GMM AICs
 ggplot(data, aes(x= model, y=AIC, color=country)) + 
   geom_jitter(position=position_jitter(0.4), size =2,alpha =0.7)+
   labs(y="AIC")+
