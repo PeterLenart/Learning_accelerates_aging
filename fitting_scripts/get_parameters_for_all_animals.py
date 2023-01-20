@@ -5,9 +5,6 @@ import os
 import cma
 import csv
 
-matplotlib.rcParams.update({'font.size': 17})
-matplotlib.rcParams['figure.figsize'] = [15, 15]
-
 # Change to the folder where your animal mortality data are saved
 folders_path = "./mortality_data/animals_and_plants/animals_for_parameters/"
 
