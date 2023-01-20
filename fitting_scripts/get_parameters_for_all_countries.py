@@ -34,9 +34,6 @@ year_list = range(1948, 2021)
 # age at which the data used to fit the model stops
 age_stop = 65
 
-# age at which the data used to evaluate the fit stops
-age_stop_test = 65
-
 # function computing the contribution of aging to the hazard rate
 @np.vectorize
 def aging_gompertz_makaham(x, a, b, c):
@@ -173,30 +170,31 @@ if __name__ == "__main__":
             if base_dataframe.empty:
                 pass
             else:
+                # Remove the row about mortality for age 110 or more
                 base_dataframe = base_dataframe[~(base_dataframe['Age'] == "110+")]
+                # Convert columns from string to int
                 base_dataframe = base_dataframe.astype({"Year" : int, "Age" : int})
 
+                 # Remove the rows for ages superior to the age where fitting stops
                 df1 = base_dataframe[base_dataframe['Age'] <= age_stop]
+                # Convert dataframe to float
                 df1 = df1.astype(float)
-
-                df1_test = base_dataframe[base_dataframe['Age'] <= age_stop_test]
-                df1_test = df1_test.astype(float)
 
                 beg = 0 #starting x 
                 fin = age_stop #final x
                 steps = age_stop+1
+                
                 x = np.linspace(beg, fin, steps)
-                x_test = np.linspace(beg, age_stop_test, age_stop_test+1)
 
+                # Remove the year and gender column
                 dataframe = df1[df1['Year'] == year]
                 dataframe = dataframe[gender]
+                # Convert to numpy array
                 mortality_array = dataframe.to_numpy().squeeze()
 
-                dataframe_test = df1_test[df1_test['Year'] == year]
-                dataframe_test = dataframe_test[gender]
-                mortality_array_test = dataframe_test.to_numpy().squeeze()
-
+                # Fit the model
                 es = fit_cma(x, mortality_array, 0.005)
+                # Retrieve and save the fitted parameters
                 params = es.result.xfavorite
                 for idx in range(params.shape[0]):
                     row.append(params[idx])

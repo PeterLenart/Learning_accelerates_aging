@@ -9,11 +9,13 @@ gender = "Total"
 # cohort or population, type of study
 data_type = "cohort"
 
-# Change to the folder when the mortality data is saved
+# Change to the folder where the mortality data is saved
 data_folder = "./mortality_data/"
 
+# Change to the folder where the parameters are saved
 params_folder = "./parameters_"+data_type+"/"+gender+"/"
 
+# Change to the folder where you want the csv containing the smeasures to be saved
 output_folder = "./gm_country_parameters_"+data_type+"/"
 s_measure_csv = output_folder+"smeasure_summary.csv"
 
@@ -25,7 +27,6 @@ for data_file in data_files:
     country = os.path.basename(data_file).split("_population")[0]
     country_list.append(country)
 
-folder = "./country_parameters/"
 # studied years
 year_list = range(1948, 1953)
 # age at which the data used to fit the model stops
@@ -82,6 +83,7 @@ def s_measure(pred, data):
     return np.mean(distance_percentage)
     # return np.average(distance_percentage, weights=weights)
 
+# Utility function, appends a row at the bottom of a csv file
 def append_list_as_row(file_name, list_of_elem):
     # Open file in append mode
     with open(file_name, 'a+', newline='') as write_obj:
@@ -110,32 +112,49 @@ if __name__ == "__main__":
             # make sure this path leads to where your data is stored
             data_path = data_folder+data_type+"/"+country+"_"+data_type+"_mortality.txt"
             
+            # Load the mortality data
             mortality_data_dataframe = pd.read_csv(data_path, sep=" ")
+            # Only keep the columns that are needed
             mortality_data_dataframe = mortality_data_dataframe[['Year', 'Age', gender]]
 
-            
+            # Only keep rows for the current studied year
             base_dataframe = mortality_data_dataframe[mortality_data_dataframe['Year'] == year]
+            # Remove the row about mortality for age 110 or more
             base_dataframe = base_dataframe[~(base_dataframe['Age'] == "110+")]
+            # Convert columns from string to int
             base_dataframe = base_dataframe.astype({"Year" : int, "Age" : int})
 
+            # Load the parameters for the studied year
             params_df = params_dataframe[params_dataframe['year'] == year]
+            # Remove the year column
             params_df = params_df.loc[:, params_df.columns != 'year']
+            # Convert pandas dataframe to numpy array
             params = params_df.to_numpy().squeeze()
+            # Retrive individual parameters from array
             a, b, c = params
 
+            # Remove the rows for ages superior to the age where fitting stops
             df1 = base_dataframe[base_dataframe['Age'] <= age_stop]
+            # Convert dataframe to float
             df1 = df1.astype(float)
 
             beg = 0 #starting x 
             fin = age_stop #final x
             steps = age_stop+1
+            
             x = np.linspace(beg, fin, steps)
 
+            # Remove the year and gender column
             dataframe = df1[df1['Year'] == year]
             dataframe = dataframe[gender]
+            # Convert to numpy array
             mortality_array = dataframe.to_numpy().squeeze()
 
+            # Get the predicted mortality curve from the parameters
             pred = np.log10(aging_gompertz_makaham(x, a, b, c))
+            # Compute smeasure between thise curve and the mortality data
             measure = s_measure(pred, np.log10(mortality_array))
+            # Append to the row
             row.append(measure)
+        # Save row in csv
         append_list_as_row(s_measure_csv, row)

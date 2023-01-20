@@ -1,11 +1,7 @@
 import pandas as pd
 import numpy as np
-import matplotlib
 import os
 import csv
-
-matplotlib.rcParams.update({'font.size': 17})
-matplotlib.rcParams['figure.figsize'] = [15, 15]
 
 # Male, Female or Total, studied gender of the mortality data
 gender = "Total"
