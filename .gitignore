@@ -36,6 +36,7 @@
 __pycache__/
 *.py[cod]
 
+
 # Other useless directories #
 #############################
 runs/
@@ -46,3 +47,4 @@ runs/
 *.txt
 */target
 */output
+*/simulation_results
