@@ -44,3 +44,5 @@ runs/
 ################
 
 *.txt
+*/target
+*/output
