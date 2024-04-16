@@ -12,6 +12,7 @@ fn main() -> Result<(), Box<dyn Error>>{
 
     // LMAX GRID
 
+    // Generate two regular grids of b and lmax values, a base grid and a grid where b is reduced by some factor
     let dim = 200;
     
     let (base_b_grid, reduced_b_grid) = generate_grids(
@@ -24,12 +25,14 @@ fn main() -> Result<(), Box<dyn Error>>{
         0.95,
     );
 
+    // Define GLA parameters
     let minimum_mortality = 1e-5f64;
     let aging_parameters = [0.00275961297460256,0.04326224872667336,0.025201676835511704] ;
-    // let learning_parameters = [0.01606792505529796,39.006865144958745,0.11060749334680318];
-    let learning_parameters = [0.01606792505529796, 35.0,0.11060749334680318];
+    let learning_parameters = [0.01606792505529796,39.006865144958745,0.11060749334680318];
+    // let learning_parameters = [0.01606792505529796, 35.0,0.11060749334680318];
     let growth_parameters: [f64; 2] = [0.05168141300917714,0.08765165352033985];
 
+    // Define intermediate aging closure
     let aging_intermediate_closure = |x: f64,
                                       aging_parameters: &[f64],
                                       learning_parameters: &[f64],
@@ -47,6 +50,7 @@ fn main() -> Result<(), Box<dyn Error>>{
         )
     };
 
+    // Define fertility parameters
     let fertility_parameters = [2.445e-5, 14.8, 32.836];
     let fertility_function = fertility_brass_polynomial;
 
@@ -56,12 +60,15 @@ fn main() -> Result<(), Box<dyn Error>>{
     // let fertility_parameters = [0.1f64, 0.1];
     // let fertility_function = linear_fertility;
 
+    // Define fertility closure
     let fertility_closure = |x: f64| -> f64 {
         fertility_function(x, &fertility_parameters)
     };
 
+    // Compute the fitness landscape for the base b grid
     let fitness_base_b = compute_fitness_grid_parallel_lmax(&base_b_grid, &aging_intermediate_closure, &aging_parameters, &learning_parameters, &growth_parameters, &fertility_closure);
     
+    // Save result
     let output_file_name = "/home/spsalmon/better_paper_code/code/output/lmax_fitness_landscapes/csv/fitness_klearning_35.csv";
 
     // Combine the grid and fitness difference into one array
@@ -82,12 +89,13 @@ fn main() -> Result<(), Box<dyn Error>>{
 
     let _ = writer.flush();
 
+    // Compute the fitness landscape for the reduced b grid
     let fitness_reduced_b = compute_fitness_grid_parallel_lmax(&reduced_b_grid, &aging_intermediate_closure, &aging_parameters, &learning_parameters, &growth_parameters, &fertility_closure);
 
+    // Compute the difference in fitness between the base and reduced b grids
     let fitness_difference = fitness_reduced_b - fitness_base_b;
 
-    // save result
-
+    // Save result
     let output_file_name = "/home/spsalmon/better_paper_code/code/output/lmax_fitness_landscapes/csv/fitness_difference_klearning_35.csv";
 
     // Combine the grid and fitness difference into one array
@@ -113,6 +121,7 @@ fn main() -> Result<(), Box<dyn Error>>{
 
     // // GMAX GRID
 
+    // // Generate two regular grids of b and gmax values, a base grid and a grid where b is reduced by some factor
     // let dim = 500;
     
     // let (base_b_grid, reduced_b_grid) = generate_grids(
@@ -125,11 +134,13 @@ fn main() -> Result<(), Box<dyn Error>>{
     //     0.95,
     // );
 
+    // // Define GLA parameters
     // let minimum_mortality = 1e-5f64;
     // let aging_parameters = [0.00275961297460256,0.04326224872667336,0.025201676835511704] ;
     // let learning_parameters = [0.01606792505529796,39.006865144958745,0.11060749334680318];
     // let growth_parameters: [f64; 2] = [0.05168141300917714,0.08765165352033985];
 
+    // // Define intermediate aging closure
     // let aging_intermediate_closure = |x: f64,
     //                                   aging_parameters: &[f64],
     //                                   learning_parameters: &[f64],
@@ -147,6 +158,7 @@ fn main() -> Result<(), Box<dyn Error>>{
     //     )
     // };
 
+    // // Define fertility parameters
     // let fertility_parameters = [2.445e-5, 14.8, 32.836];
     // let fertility_function = fertility_brass_polynomial;
 
@@ -156,12 +168,15 @@ fn main() -> Result<(), Box<dyn Error>>{
     // // let fertility_parameters = [1f64, 0.02];
     // // let fertility_function = linear_fertility;
 
+    // // Define fertility closure
     // let fertility_closure = |x: f64| -> f64 {
     //     fertility_function(x, &fertility_parameters)
     // };
 
+    // // Compute the fitness landscape for the base b grid
     // let fitness_base_b = compute_fitness_grid_parallel_gmax(&base_b_grid, &aging_intermediate_closure, &aging_parameters, &learning_parameters, &growth_parameters, &fertility_closure);
 
+    // // Save result
     // let output_file_name = "../output/gmax_fitness_landscapes/csv/gmax_fitness_brass_polynomial_g7k15.csv";
 
     // // Combine the grid and fitness difference into one array
@@ -182,12 +197,13 @@ fn main() -> Result<(), Box<dyn Error>>{
 
     // let _ = writer.flush();
 
+    // // Compute the fitness landscape for the reduced b grid
     // let fitness_reduced_b = compute_fitness_grid_parallel_gmax(&reduced_b_grid, &aging_intermediate_closure, &aging_parameters, &learning_parameters, &growth_parameters, &fertility_closure);
 
+    // // Compute the difference in fitness between the base and reduced b grids
     // let fitness_difference = fitness_reduced_b - fitness_base_b;
 
-    // // save result
-
+    // // Save result
     // let output_file_name = "../output/gmax_fitness_landscapes/csv/gmax_fitness_difference_brass_polynomial_g7k15.csv";
 
     // // Combine the grid and fitness difference into one array
