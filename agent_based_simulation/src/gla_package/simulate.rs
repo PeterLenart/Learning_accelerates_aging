@@ -7,6 +7,14 @@ use crate::gla_package::agent_based::{
     increment_age_population, initialize_population,
 };
 
+/// Struct to store the results of a simulation
+/// 
+/// # Fields
+/// * `mean_b` - The mean value of the b parameter in the population
+/// * `mean_lmax` - The mean value of the lmax parameter in the population
+/// * `mean_gmax` - The mean value of the gmax parameter in the population
+/// * `time` - The time current time of the simulation
+/// * `replicate_id` - The ID of the replicate
 #[derive(serde::Serialize)]
 struct SimulationResult {
     mean_b: f64,
@@ -16,6 +24,7 @@ struct SimulationResult {
     replicate_id: i32,
 }
 
+/// Run a simulation of the agent-based model
 pub fn run_simulation(
     output_writer: &mut Writer<File>,
     population_cap: usize,
@@ -49,6 +58,8 @@ pub fn run_simulation(
     male_menopause: f64,
     female_menopause: f64,
 ) {
+
+    /// Initialize the population with the provided parameters
     // let mut wtr = Writer::from_path("foo.csv").unwrap();
     let mut population = initialize_population(
         population_cap,
@@ -61,6 +72,8 @@ pub fn run_simulation(
         initial_gmax_distribution,
         initial_female_proportion,
     );
+
+    /// Create a progress bar
     let bar = ProgressBar::new(simulation_time as u64);
     bar.set_style(
         ProgressStyle::with_template(
@@ -69,8 +82,12 @@ pub fn run_simulation(
         .unwrap()
         .progress_chars("##-"),
     );
+
+    /// Run the simulation
     for i in 0..simulation_time {
+        /// Remove agents that die during the current time step
         get_death_population(&mut population, time_step, &aging_intermediate_closure, remove_non_reproducing, male_menopause, female_menopause);
+        /// Create new agents through sexual reproduction
         get_reproduction_population(
             &mut population,
             assortative_mating,
@@ -89,11 +106,14 @@ pub fn run_simulation(
             lmax_mutation_strength,
             gmax_mutation_strength,
         );
+        /// Increment the age of all agents in the population
         increment_age_population(&mut population, time_step);
+        /// Get the statistics for the current population
         let b_stats = get_population_b_stats(&population);
         let lmax_stats = get_population_lmax_stats(&population);
         let gmax_stats = get_population_gmax_stats(&population);
 
+        /// Write the results to the output file
         let res = SimulationResult {
             mean_b: b_stats.0,
             mean_lmax: lmax_stats.0,
