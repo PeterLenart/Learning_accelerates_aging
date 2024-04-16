@@ -182,12 +182,20 @@ pub fn mortality_improvement_function(x: f64, improvement_parameters: &[f64]) ->
         improvement_parameters[1],
         improvement_parameters[2],
     );
-    if x < start {
-        0_f64
-    } else if x > end {
-        1_f64
+    
+    /// If end is inf, then the improvement is applied from start to infinity.
+    if end.is_infinite() {
+        if x >= start {
+            factor
+        } else {
+            0_f64
+        }
     } else {
-        factor
+        if (x >= start) && (x <= end) {
+            factor
+        } else {
+            0_f64
+        }
     }
 }
 
