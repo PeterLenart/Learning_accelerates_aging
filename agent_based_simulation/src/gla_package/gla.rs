@@ -63,7 +63,6 @@ pub fn aging_gompertz_makeham(x: f64, aging_parameters: &[f64]) -> f64 {
 ///
 /// # Returns
 /// Returns the benefit of learning on mortality at the input `x`, calculated using the provided `lmax`, `k`, and `n`.
-///
 pub fn learning_function(x: f64, learning_parameters: &[f64]) -> f64 {
     let (lmax, k, n) = (
         learning_parameters[0],
@@ -73,11 +72,32 @@ pub fn learning_function(x: f64, learning_parameters: &[f64]) -> f64 {
     lmax * ((1_f64 / (1_f64 + (n * (x - k)).exp())) - 1_f64)
 }
 
+/// Calculate the benefit of growth on mortality.
+///
+/// # Arguments
+/// * `x` - The age at which to calculate the growth benefit.
+/// * `growth_parameters` - An array containing the parameters for the growth curve:
+///     - `growth_parameters[0]` (gmax): The maximum growth benefit.
+///     - `growth_parameters[1]` (growth_rate): The steepness of the curve.
+///
+/// # Returns
+/// Returns the benefit of growth on mortality at the input `x`, calculated using the provided `gmax` and `growth_rate`.
 pub fn growth_function(x: f64, growth_parameters: &[f64]) -> f64 {
     let (gmax, growth_rate) = (growth_parameters[0], growth_parameters[1]);
     gmax * ((1_f64 / (1_f64 + x.powf(growth_rate))) - 1_f64)
 }
 
+/// Calculate the fertility based on the Brass polynomial model.
+///
+/// # Arguments
+/// * `x` - The age at which to calculate the fertility rate.
+/// * `fertility_parameters` - An array containing the parameters for the Brass polynomial:
+///     - `fertility_parameters[0]` (c): Level parameter, proportional to the TFR.
+///     - `fertility_parameters[1]` (d): The age at which fertility begins.
+///     - `fertility_parameters[2]` (w): The width of the fertility window.
+///
+/// # Returns
+/// Returns the fertility rate at the input `x`, calculated using the provided `c`, `d`, and `w`.
 pub fn fertility_brass_polynomial(x: f64, fertility_parameters: &[f64]) -> f64 {
     let (c, d, w) = (
         fertility_parameters[0],
@@ -91,13 +111,34 @@ pub fn fertility_brass_polynomial(x: f64, fertility_parameters: &[f64]) -> f64 {
     }
 }
 
+/// Calculate the fertility based on a constant fertility model.
+///
+/// # Arguments
+/// * `x` - The age at which to calculate the fertility rate.
+/// * `fertility_parameters` - An array containing the parameters for the constant fertility model:
+///     - `fertility_parameters[0]` (c): The constant fertility rate.
+///
+/// # Returns
+/// Returns the fertility rate at the input `x`, calculated using the provided `c`.
 pub fn constant_fertility(_x: f64, fertility_parameters: &[f64]) -> f64 {
     let c = fertility_parameters[0];
     c
 }
 
-
-
+/// Calculate mortality based on the GLA model.
+///
+/// # Arguments
+/// * `x` - The age at which to calculate the mortality rate.
+/// * `aging_func` - The function to calculate the contribution of aging to mortality.
+/// * `learning_func` - The function to calculate the contribution of learning to mortality.
+/// * `growth_func` - The function to calculate the contribution of growth to mortality.
+/// * `aging_parameters` - An array containing the parameters for the aging function.
+/// * `learning_parameters` - An array containing the parameters for the learning function.
+/// * `growth_parameters` - An array containing the parameters for the growth function.
+/// * `minimum_mortality` - The minimum mortality rate.
+///
+/// # Returns
+/// Returns the mortality rate at age `x`, calculated using the provided functions and parameters. If the calculated mortality rate is less than the minimum mortality rate, the minimum mortality rate is returned instead
 pub fn gla_model<T>(
     x: f64,
     aging_func: T,
@@ -124,6 +165,15 @@ where
     }
 }
 
+/// Find the age at which the fertility rate is maximized and the value of the maximum fertility rate for a given fertility function.
+///
+/// # Arguments
+/// * `fertility_function` - The fertility function to optimize.
+/// * `fertility_parameters` - An array containing the parameters for the fertility function.
+/// * `first_guess` - The initial guess for the age at which fertility is maximized.
+///
+/// # Returns
+/// Returns the maximum fertility rate of the input fertility function.
 pub fn find_maximum_fertility<T>(
     fertility_function: &T,
     fertility_parameters: &[f64],
