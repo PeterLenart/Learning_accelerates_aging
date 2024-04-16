@@ -117,7 +117,7 @@ pub fn get_proba_of_death_agent(
     )
 }
 
-/// Determines whether an agent dies during a given time step based on mortality probabilities and additional reproductive conditions.
+/// Determine whether an agent dies during a given time step based on mortality probabilities and additional reproductive conditions.
 /// Agents past menopause are considered non-reproducing and can be removed based on the `remove_non_reproducing` flag.
 ///
 /// # Arguments
@@ -150,7 +150,16 @@ pub fn get_death_agent(
     true
 }
 
-
+/// Determine which agents in a population die during a given time step and removes them from the population.
+/// Agents past menopause are considered non-reproducing and can be removed based on the `remove_non_reproducing` flag.
+///
+/// # Arguments
+/// * `population` - A mutable reference to a vector of `Agent` structs representing the population of agents.
+/// * `time_step` - The time interval over which to calculate the probability of death.
+/// * `aging_intermediate_closure` - A closure that computes the aging effects using the agent's parameters.
+/// * `remove_non_reproducing` - A boolean indicating whether to automatically consider agents past menopause as dead.
+/// * `male_menopause` - The menopause age for male agents.
+/// * `female_menopause` - The menopause age for female agents.
 pub fn get_death_population<F: Fn(f64, &[f64], &[f64], &[f64]) -> f64 + Send + Sync>(
     population: &mut Vec<Agent>,
     time_step: f64,
@@ -178,16 +187,32 @@ pub fn get_death_population<F: Fn(f64, &[f64], &[f64], &[f64]) -> f64 + Send + S
     }
 }
 
+/// Increment the age of all agents in the population by a specified time step.
+///
+/// # Arguments
+/// * `population` - A mutable reference to a vector of `Agent` structs representing the population of agents.
+/// * `time_step` - The time step by which to increment the age of all agents.
 pub fn increment_age_population(population: &mut Vec<Agent>, time_step: f64) {
     for agent in population.iter_mut() {
         agent.age += time_step;
     }
 }
 
+/// Sort the population of agents by age in ascending order.
+///
+/// # Arguments
+/// * `population` - A mutable reference to a vector of `Agent` structs representing the population of agents.
 pub fn sort_population_by_age(population: &mut Vec<Agent>) {
     population.sort_by(|a, b| a.age.partial_cmp(&b.age).unwrap());
 }
 
+/// Create male and female couples by pairing agents two by two, in the order they appear in the population.
+///
+/// # Arguments
+/// * `population` - A reference to a vector of `Agent` structs representing the population of agents.
+///
+/// # Returns
+/// Returns a vector of tuples, each containing a male and a female agent.
 pub fn create_couples(population: &Vec<Agent>) -> Vec<(&Agent, &Agent)> {
     let mut female_population = population
         .iter()
@@ -209,6 +234,19 @@ pub fn create_couples(population: &Vec<Agent>) -> Vec<(&Agent, &Agent)> {
     zip(male_population, female_population).collect::<Vec<_>>()
 }
 
+/// Test whether a couple of agents successfully reproduces based on their fertility.
+///
+/// # Arguments
+/// * `couple` - A tuple containing
+///     * couple.0 - A reference to the male agent.
+///     * couple.1 - A reference to the female agent.
+/// * `normalized_male_fertility_closure` - A closure that calculates the chance of reproducing successfully for the male agent.
+/// * `normalized_female_fertility_closure` - A closure that calculates the chance of reproducing successfully for the female agent.
+/// * `tradeoff` - A boolean indicating whether to apply a tradeoff between fertility and aging.
+/// * `start_b` - The initial value of the b parameter for the agents, used if tradeoff is set to `true`.
+///
+/// # Returns
+/// Returns `true` if the couple successfully reproduces, otherwise `false`.
 pub fn reproduction_test_couple(
     couple: &(&Agent, &Agent),
     normalized_male_fertility_closure: &Box<impl Fn(f64) -> f64>,
@@ -230,6 +268,12 @@ pub fn reproduction_test_couple(
         && (rand::random::<f64>() < female_chance_to_reproduce)
 }
 
+/// Potentially mutate a parameter by adding a random value sampled from a normal distribution.
+///
+/// # Arguments
+/// * `param` - A mutable reference to the parameter to mutate.
+/// * `mutation_rate` - The probability of mutation for the parameter.
+/// * `mutation_strength` - The standard deviation of the normal distribution used to sample the mutation value.
 pub fn mutate_parameter(param: &mut f64, mutation_rate: f64, mutation_strength: f64) {
     if rand::random::<f64>() < mutation_rate {
         let mutation_dist = Normal::new(*param, mutation_strength).unwrap();
@@ -237,6 +281,27 @@ pub fn mutate_parameter(param: &mut f64, mutation_rate: f64, mutation_strength: 
     }
 }
 
+/// Create a new agent by combining the parameters of two parent agents and factoring potential mutations.
+///
+/// # Arguments
+/// * `couple` - A tuple containing
+///     * couple.0 - A reference to the male parent agent.
+///     * couple.1 - A reference to the female parent agent.
+/// * `aging_parameters` - A vector of floating-point numbers representing parameters for the aging function.
+/// * `learning_parameters` - A vector of floating-point numbers representing parameters for the learning benefit function.
+/// * `growth_parameters` - A vector of floating-point numbers that represent growth benefit function.
+/// * `mutable_b` - A boolean indicating whether the b parameter is mutable.
+/// * `mutable_lmax` - A boolean indicating whether the lmax parameter is mutable.
+/// * `mutable_gmax` - A boolean indicating whether the gmax parameter is mutable.
+/// * `b_mutation_rate` - The probability of mutation for the b parameter.
+/// * `lmax_mutation_rate` - The probability of mutation for the lmax parameter.
+/// * `gmax_mutation_rate` - The probability of mutation for the gmax parameter.
+/// * `b_mutation_strength` - The standard deviation of the normal distribution used to sample the mutation value for the b parameter.
+/// * `lmax_mutation_strength` - The standard deviation of the normal distribution used to sample the mutation value for the lmax parameter.
+/// * `gmax_mutation_strength` - The standard deviation of the normal distribution used to sample the mutation value for the gmax parameter.
+///
+/// # Returns
+/// Returns a new agent created by combining the parameters of the parent agents and potentially mutating them.
 pub fn reproduction_couple(
     couple: &(&Agent, &Agent),
     aging_parameters: &[f64],
@@ -285,6 +350,25 @@ pub fn reproduction_couple(
     }
 }
 
+/// Creates new agents based on the reproduction of successful couples and adds them to the population until the population cap is reached.
+///
+/// # Arguments
+/// * `population` - A mutable reference to a vector of `Agent` structs representing the population of agents.
+/// * `assortative_mating` - A boolean indicating whether to sort the population by age before reproduction
+/// * `normalized_male_fertility_closure` - A closure that calculates the chance of reproducing successfully for male agents.
+/// * `normalized_female_fertility_closure` - A closure that calculates the chance of reproducing successfully for female agents.
+/// * `tradeoff` - A boolean indicating whether to apply a tradeoff between fertility and aging.
+/// * `start_b` - The initial value of the b parameter for the agents, used if tradeoff is set to `true`.
+/// * `population_cap` - The maximum population size.
+/// * `mutable_b` - A boolean indicating whether the b parameter is mutable.
+/// * `mutable_lmax` - A boolean indicating whether the lmax parameter is mutable.
+/// * `mutable_gmax` - A boolean indicating whether the gmax parameter is mutable.
+/// * `b_mutation_rate` - The probability of mutation for the b parameter.
+/// * `lmax_mutation_rate` - The probability of mutation for the lmax parameter.
+/// * `gmax_mutation_rate` - The probability of mutation for the gmax parameter.
+/// * `b_mutation_strength` - The standard deviation of the normal distribution used to sample the mutation value for the b parameter.
+/// * `lmax_mutation_strength` - The standard deviation of the normal distribution used to sample the mutation value for the lmax parameter.
+/// * `gmax_mutation_strength` - The standard deviation of the normal distribution used to sample the mutation value for the gmax parameter.
 pub fn get_reproduction_population(
     population: &mut Vec<Agent>,
     assortative_mating: bool,
@@ -303,11 +387,13 @@ pub fn get_reproduction_population(
     lmax_mutation_strength: f64,
     gmax_mutation_strength: f64,
 ) {
+    /// If assortative mating is enabled, sort the population by age before reproduction. Otherwise, shuffle the population.
     if assortative_mating {
         sort_population_by_age(population);
     }else{
         population.shuffle(&mut rand::thread_rng());
     }
+    /// Create couples from the population and check if they successfully reproduce.
     let couples = create_couples(population);
     let reproduction_test = couples
         .iter()
@@ -322,6 +408,7 @@ pub fn get_reproduction_population(
         })
         .collect::<Vec<_>>();
 
+    /// Filter the successful couples and create new agents based on their reproduction.
     let successful_couples_indexes: Vec<usize> = reproduction_test
         .iter()
         .enumerate()
@@ -350,14 +437,23 @@ pub fn get_reproduction_population(
         })
         .collect();
 
+    /// Shuffle the new babies and remove any excess agents to maintain the population cap.
     new_babies.shuffle(&mut rand::thread_rng());
     if new_babies.len() > population_cap as usize - population.len() {
         new_babies = new_babies[..(population_cap as usize - population.len())].to_vec();
     }
 
+    /// Add the new agents to the population.
     population.extend(new_babies);
 }
 
+/// Calculate the mean and variance of the b parameter in the population.
+///
+/// # Arguments
+/// * `population` - A reference to a vector of `Agent` structs representing the population of agents.
+///
+/// # Returns
+/// Returns a tuple containing the mean and variance of the b parameter in the population.
 pub fn get_population_b_stats(population: &Vec<Agent>) -> (f64, f64) {
     let b_values = population
         .iter()
@@ -375,6 +471,13 @@ pub fn get_population_b_stats(population: &Vec<Agent>) -> (f64, f64) {
     (b_mean, b_variance)
 }
 
+/// Calculate the mean and variance of the lmax parameter in the population.
+///
+/// # Arguments
+/// * `population` - A reference to a vector of `Agent` structs representing the population of agents.
+///
+/// # Returns
+/// Returns a tuple containing the mean and variance of the lmax parameter in the population.
 pub fn get_population_lmax_stats(population: &Vec<Agent>) -> (f64, f64){
     let lmax_values = population
         .iter()
@@ -392,6 +495,13 @@ pub fn get_population_lmax_stats(population: &Vec<Agent>) -> (f64, f64){
     (lmax_mean, lmax_variance)
 }
 
+/// Calculate the mean and variance of the gmax parameter in the population.
+///
+/// # Arguments
+/// * `population` - A reference to a vector of `Agent` structs representing the population of agents.
+///
+/// # Returns
+/// Returns a tuple containing the mean and variance of the gmax parameter in the population.
 pub fn get_population_gmax_stats(population: &Vec<Agent>) -> (f64, f64){
     let gmax_values = population
         .iter()
