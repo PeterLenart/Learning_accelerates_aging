@@ -87,7 +87,7 @@ pub fn run_simulation(
     for i in 0..simulation_time {
         /// Remove agents that die during the current time step
         get_death_population(&mut population, time_step, &aging_intermediate_closure, remove_non_reproducing, male_menopause, female_menopause);
-        /// Create new agents through sexual reproduction
+        /// Create new agents through sexual reproduction until the population reaches the cap
         get_reproduction_population(
             &mut population,
             assortative_mating,
