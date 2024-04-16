@@ -1,11 +1,48 @@
 use ndarray::{Array, ArrayView1};
 use optimize::{Minimizer, NelderMeadBuilder};
 
+/// Calculate mortality based on the Gompertz model. 
+///
+/// # Arguments
+/// * `x` - The age at which to calculate the mortality rate.
+/// * `aging_parameters` - An array containing the parameters for the Gompertz function:
+///     - `aging_parameters[0]` (a): The initial mortality rate (intercept).
+///     - `aging_parameters[1]` (b): The rate of increase in mortality rate with age (slope).
+///
+/// # Returns
+/// Returns the mortality rate at age `x`, calculated using the provided `a` and `b` parameters.
+///
+/// # Examples
+/// ```
+/// let age = 50.0;
+/// let parameters = [0.01, 0.02];
+/// let mortality_rate = _aging_gompertz(age, &parameters);
+/// assert_eq!(mortality_rate, 0.01 * (50.0 * 0.02).exp());
+/// ```
 pub fn _aging_gompertz(x: f64, aging_parameters: &[f64]) -> f64 {
     let (a, b) = (aging_parameters[0], aging_parameters[1]);
     a * (x * b).exp()
 }
 
+/// Calculate mortality based on the Gompertz-Makeham model.
+///
+/// # Arguments
+/// * `x` - The age at which to calculate the mortality rate.
+/// * `aging_parameters` - An array containing the parameters for the Gompertz-Makeham function:
+///     - `aging_parameters[0]` (a): The initial mortality rate (intercept).
+///     - `aging_parameters[1]` (b): The rate of increase in mortality rate with age (slope).
+///     - `aging_parameters[2]` (c): Constant age-independent mortality factor.
+///
+/// # Returns
+/// Returns the mortality rate at age `x`, calculated using the provided `a`, `b`, and `c` parameters.
+///
+/// # Examples
+/// ```
+/// let age = 50.0;
+/// let parameters = [0.01, 0.02, 0.005];
+/// let mortality_rate = aging_gompertz_makeham(age, &parameters);
+/// assert_eq!(mortality_rate, 0.005 + 0.01 * (50.0 * 0.02).exp());
+/// ```
 pub fn aging_gompertz_makeham(x: f64, aging_parameters: &[f64]) -> f64 {
     let (a, b, c) = (
         aging_parameters[0],
@@ -15,6 +52,18 @@ pub fn aging_gompertz_makeham(x: f64, aging_parameters: &[f64]) -> f64 {
     c + a * (x * b).exp()
 }
 
+/// Calculate benefit of learning on mortality based on a modified logistic model.
+///
+/// # Arguments
+/// * `x` - The age at which to calculate the learning benefit.
+/// * `learning_parameters` - An array containing the parameters for the learning curve:
+///     - `learning_parameters[0]` (lmax): The maximum learning benefit.
+///     - `learning_parameters[1]` (k): The inflection point of the curve.
+///     - `learning_parameters[2]` (n): The steepness of the curve.
+///
+/// # Returns
+/// Returns the benefit of learning on mortality at the input `x`, calculated using the provided `lmax`, `k`, and `n`.
+///
 pub fn learning_function(x: f64, learning_parameters: &[f64]) -> f64 {
     let (lmax, k, n) = (
         learning_parameters[0],
