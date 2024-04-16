@@ -165,6 +165,64 @@ where
     }
 }
 
+/// Calculate the improvement in mortality based on a step function.
+///
+/// # Arguments
+/// * `x` - The age at which to calculate the improvement.
+/// * `improvement_parameters` - An array containing the parameters for the improvement function:
+///     - `improvement_parameters[0]` (start): The age at which the improvement begins.
+///     - `improvement_parameters[1]` (end): The age at which the improvement ends.
+///     - `improvement_parameters[2]` (factor): The factor by which to improve mortality.
+///
+/// # Returns
+/// Returns the improvement in mortality at the input `x`, calculated using the provided `start`, `end`, and `factor`.
+pub fn mortality_improvement_function(x: f64, improvement_parameters: &[f64]) -> f64 {
+    let (start, end, factor) = (
+        improvement_parameters[0],
+        improvement_parameters[1],
+        improvement_parameters[2],
+    );
+    if x < start {
+        0_f64
+    } else if x > end {
+        1_f64
+    } else {
+        factor
+    }
+}
+
+/// Calculate mortality based on a toy model. Dirty implementation made to fit with the current implementation of the GLA model.
+///
+/// # Arguments
+/// * `x` - The age at which to calculate the mortality rate.
+/// * `aging_func` - The function to calculate the contribution of aging to mortality.
+/// * `improvement_func` - The function to calculate the contribution of improvement to mortality.
+/// * `aging_parameters` - An array containing the parameters for the aging function.
+/// * `improvement_parameters` - An array containing the parameters for the improvement function.
+/// * `minimum_mortality` - The minimum mortality rate.
+pub fn toy_model<T>(
+    x: f64,
+    aging_func: T,
+    improvement_func: T,
+    aging_parameters: &[f64],
+    improvement_parameters: &[f64],
+    minimum_mortality: f64,
+) -> f64
+where
+    T: Fn(f64, &[f64]) -> f64,
+{
+    let aging = aging_func(x, aging_parameters);
+    let improvement = improvement_func(x, improvement_parameters);
+
+    let result aging * improvement;
+
+    if result < minimum_mortality {
+        minimum_mortality
+    } else {
+        result
+    }
+}
+
 /// Find the age at which the fertility rate is maximized and the value of the maximum fertility rate for a given fertility function.
 ///
 /// # Arguments
