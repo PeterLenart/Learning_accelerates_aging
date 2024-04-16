@@ -2,7 +2,7 @@ mod gla_package;
 use csv::Writer;
 use crate::gla_package::{gla::{
     aging_gompertz_makeham, fertility_brass_polynomial, find_maximum_fertility, gla_model,
-    growth_function, learning_function, constant_fertility,
+    growth_function, learning_function, constant_fertility, mortality_improvement_function, toy_model, _aging_gompertz,
 }, simulate::run_simulation};
 
 fn main() {
@@ -13,9 +13,13 @@ fn main() {
     let minimum_mortality = 1e-5;
 
     // Define GLA parameters
-    let aging_parameters = [0.00275961297460256,0.04326224872667336,0.025201676835511704] ;
-    let learning_parameters = [0.01606792505529796,39.006865144958745,0.11060749334680318];
-    let growth_parameters: [f64; 2] = [0.05168141300917714,0.08765165352033985];
+    // let aging_parameters = [0.00275961297460256,0.04326224872667336,0.025201676835511704] ;
+    // let learning_parameters = [0.01606792505529796,39.006865144958745,0.11060749334680318];
+    // let growth_parameters: [f64; 2] = [0.05168141300917714,0.08765165352033985];
+
+    // Define toy model parameters
+    let aging_parameters = [1.0, 1.0];
+    let improvement_parameters = [0.0, 15.0, 0.5];
 
     // Define fertility parameters
     let female_fertility_parameters = [1.0];
@@ -38,13 +42,16 @@ fn main() {
     // let male_fertility_function = fertility_brass_polynomial;
 
     // Define normalized fertility closures
-    let female_maximum_fertility = find_maximum_fertility(
-        &female_fertility_function,
-        &female_fertility_parameters,
-        20.0,
-    );
-    let male_maximum_fertility =
-        find_maximum_fertility(&male_fertility_function, &male_fertility_parameters, 20.0);
+    // let female_maximum_fertility = find_maximum_fertility(
+    //     &female_fertility_function,
+    //     &female_fertility_parameters,
+    //     20.0,
+    // );
+    // let male_maximum_fertility =
+    //     find_maximum_fertility(&male_fertility_function, &male_fertility_parameters, 20.0);
+
+    let female_maximum_fertility = 1.0;
+    let male_maximum_fertility = 1.0;
 
     let normalized_male_fertility_closure = Box::new(|x: f64| -> f64 {
         (male_fertility_function(x, &male_fertility_parameters) / male_maximum_fertility).min(1.0)
@@ -56,19 +63,35 @@ fn main() {
     });
 
     // Define aging intermediate closure
+    // let aging_intermediate_closure = |x: f64,
+    //                                   aging_parameters: &[f64],
+    //                                   learning_parameters: &[f64],
+    //                                   growth_parameters: &[f64]|
+    //  -> f64 {
+    //     gla_model(
+    //         x,
+    //         aging_gompertz_makeham as fn(f64, &[f64]) -> f64,
+    //         learning_function,
+    //         growth_function,
+    //         &aging_parameters,
+    //         &learning_parameters,
+    //         &growth_parameters,
+    //         minimum_mortality,
+    //     )
+    // };
+
+    // Dirty hack to use toy model, the growth parameters are not used
     let aging_intermediate_closure = |x: f64,
                                       aging_parameters: &[f64],
-                                      learning_parameters: &[f64],
+                                      improvement_parameters: &[f64],
                                       growth_parameters: &[f64]|
      -> f64 {
-        gla_model(
+        toy_model(
             x,
-            aging_gompertz_makeham as fn(f64, &[f64]) -> f64,
-            learning_function,
-            growth_function,
+            _aging_gompertz as fn(f64, &[f64]) -> f64,
+            mortality_improvement_function,
             &aging_parameters,
-            &learning_parameters,
-            &growth_parameters,
+            &improvement_parameters,
             minimum_mortality,
         )
     };
@@ -78,11 +101,17 @@ fn main() {
     // #######################################################
 
     // Define initial distributions
-    let initial_age_distribution = [20.0, 10.0];
-    let initial_b_distribution = [0.14, 0.005];
-    let mut initial_lmax_distribution = [0.15, 0.0];
-    let mut initial_gmax_distribution = [0.05168141300917714, 0.0]; 
+    // let initial_age_distribution = [20.0, 10.0];
+    // let initial_b_distribution = [0.14, 0.005];
+    // let mut initial_lmax_distribution = [0.15, 0.0];
+    // let mut initial_gmax_distribution = [0.05168141300917714, 0.0]; 
     // let mut initial_gmax_distribution = [0.055, 0.0]
+    
+    // Define initial distributions for the toy model
+    let initial_age_distribution = [20.0, 10.0];
+    let initial_b_distribution = [1.0, 0.0];
+    let initial_lmax_distribution = [0.5, 0.0];
+    let initial_gmax_distribution = [1.0, 0.0];
 
     // Define simulation parameters
     let population_cap = 10000;

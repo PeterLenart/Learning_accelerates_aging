@@ -170,14 +170,14 @@ where
 /// # Arguments
 /// * `x` - The age at which to calculate the improvement.
 /// * `improvement_parameters` - An array containing the parameters for the improvement function:
-///     - `improvement_parameters[0]` (start): The age at which the improvement begins.
-///     - `improvement_parameters[1]` (end): The age at which the improvement ends.
-///     - `improvement_parameters[2]` (factor): The factor by which to improve mortality.
+///     - `improvement_parameters[0]` (factor): The factor by which to improve mortality.
+///     - `improvement_parameters[1]` (start): The age at which the improvement begins.
+///     - `improvement_parameters[2]` (end): The age at which the improvement ends.
 ///
 /// # Returns
 /// Returns the improvement in mortality at the input `x`, calculated using the provided `start`, `end`, and `factor`.
 pub fn mortality_improvement_function(x: f64, improvement_parameters: &[f64]) -> f64 {
-    let (start, end, factor) = (
+    let (factor, start, end) = (
         improvement_parameters[0],
         improvement_parameters[1],
         improvement_parameters[2],
@@ -188,13 +188,13 @@ pub fn mortality_improvement_function(x: f64, improvement_parameters: &[f64]) ->
         if x >= start {
             factor
         } else {
-            0_f64
+            1_f64
         }
     } else {
         if (x >= start) && (x <= end) {
             factor
         } else {
-            0_f64
+            1_f64
         }
     }
 }
