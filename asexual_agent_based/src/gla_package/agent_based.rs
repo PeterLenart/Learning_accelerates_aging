@@ -4,6 +4,13 @@ use rand::seq::SliceRandom;
 use rand_distr::{Distribution, Normal};
 use rayon::prelude::*;
 
+/// Struct representing an agent in the simulation.
+///
+/// # Fields
+/// * `age` - The current age of the agent in years.
+/// * `aging_parameters` - A vector of floating-point numbers representing parameters for the aging function
+/// * `learning_parameters` - A vector of floating-point numbers representing parameters for learning benefit function.
+/// * `growth_parameters` - A vector of floating-point numbers that represent growth benefit function.
 #[derive(Clone)]
 pub struct Agent {
     pub age: f64,
@@ -12,6 +19,19 @@ pub struct Agent {
     pub growth_parameters: Vec<f64>,
 }
 
+/// Initialize a population of agents with random parameters based on normal distributions.
+///
+/// # Arguments
+/// * `initial_population_size` - The number of agents to create in the population.
+/// * `aging_parameters` - A vector of floating-point numbers representing parameters for the aging function.
+/// * `learning_parameters` - A vector of floating-point numbers representing parameters for the learning benefit function.
+/// * `growth_parameters` - A vector of floating-point numbers that represent growth benefit function.
+/// * `initial_age_distribution` - A two-element array representing the mean and standard deviation of the initial age distribution.
+/// * `initial_b_distribution` - A two-element array representing the mean and standard deviation of the initial b distribution.
+/// * `initial_lmax_distribution` - A two-element array representing the mean and standard deviation of the initial lmax distribution.
+///
+/// # Returns
+/// Returns a vector of agents with random parameters based on the specified distributions.
 pub fn initialize_population<'a, 'b>(
     initial_population_size: usize,
     aging_parameters: &[f64],
@@ -53,6 +73,18 @@ pub fn initialize_population<'a, 'b>(
     population
 }
 
+/// Calculate the probability of death for an agent over a given time step using an aging model.
+///
+/// This function integrates an aging model over a specified time interval to estimate the probability of death.
+/// It utilizes a custom closure that combines aging, learning, and growth parameters of the agent.
+///
+/// # Arguments
+/// * `agent` - A reference to an Agent struct containing the agent's parameters and current age.
+/// * `time_step` - The time interval over which to calculate the probability of death.
+/// * `aging_intermediate_closure` - A closure that computes aging effects using three different parameter sets.
+///
+/// # Returns
+/// Returns the estimated probability of death for the agent over the specified time step.
 pub fn get_proba_of_death_agent(
     agent: &Agent,
     time_step: f64,
@@ -72,6 +104,15 @@ pub fn get_proba_of_death_agent(
     )
 }
 
+/// Determine whether an agent dies during a given time step based on mortality probabilities.
+///
+/// # Arguments
+/// * `agent` - A reference to the `Agent` struct, representing the agent whose death is being evaluated.
+/// * `time_step` - The time interval over which to calculate the probability of death.
+/// * `aging_intermediate_closure` - A closure that computes the aging effects using the agent's parameters.
+///
+/// # Returns
+/// Returns `true` if the agent is dead by the end of the time step, otherwise `false`.
 pub fn get_death_agent(
     agent: &Agent,
     time_step: f64,
@@ -81,6 +122,12 @@ pub fn get_death_agent(
     rand::random::<f64>() < proba_of_death
 }
 
+/// Determine which agents in a population die during a given time step and removes them from the population.
+///
+/// # Arguments
+/// * `population` - A mutable reference to a vector of `Agent` structs representing the population of agents.
+/// * `time_step` - The time interval over which to calculate the probability of death.
+/// * `aging_intermediate_closure` - A closure that computes the aging effects using the agent's parameters.
 pub fn get_death_population<F: Fn(f64, &[f64], &[f64], &[f64]) -> f64 + Send + Sync>(
     population: &mut Vec<Agent>,
     time_step: f64,
@@ -105,12 +152,23 @@ pub fn get_death_population<F: Fn(f64, &[f64], &[f64], &[f64]) -> f64 + Send + S
     }
 }
 
+/// Increment the age of all agents in the population by a specified time step.
+///
+/// # Arguments
+/// * `population` - A mutable reference to a vector of `Agent` structs representing the population of agents.
+/// * `time_step` - The time step by which to increment the age of all agents.
 pub fn increment_age_population(population: &mut Vec<Agent>, time_step: f64) {
     for agent in population.iter_mut() {
         agent.age += time_step;
     }
 }
 
+/// Potentially mutate a parameter by adding a random value sampled from a normal distribution.
+///
+/// # Arguments
+/// * `param` - A mutable reference to the parameter to mutate.
+/// * `mutation_rate` - The probability of mutation for the parameter.
+/// * `mutation_strength` - The standard deviation of the normal distribution used to sample the mutation value.
 pub fn mutate_parameter(param: &mut f64, mutation_rate: f64, mutation_strength: f64) {
     if rand::random::<f64>() < mutation_rate {
         let mutation_dist = Normal::new(*param, mutation_strength).unwrap();
@@ -118,6 +176,19 @@ pub fn mutate_parameter(param: &mut f64, mutation_rate: f64, mutation_strength: 
     }
 }
 
+/// Clone an agent and potentially mutate its parameters.
+///
+/// # Arguments
+/// * `agent` - A reference to the `Agent` struct to clone.
+/// * `mutable_b` - A boolean indicating whether the `b` parameter is mutable.
+/// * `mutable_lmax` - A boolean indicating whether the `lmax` parameter is mutable.
+/// * `b_mutation_rate` - The probability of mutation for the `b` parameter.
+/// * `lmax_mutation_rate` - The probability of mutation for the `lmax` parameter.
+/// * `b_mutation_strength` - The standard deviation of the normal distribution used to sample the mutation value for `b`.
+/// * `lmax_mutation_strength` - The standard deviation of the normal distribution used to sample the mutation value for `lmax`.
+///
+/// # Returns
+/// Returns a new `Agent` struct that is a clone of the input agent with potentially mutated parameters.
 pub fn clone_agent(
     agent: &Agent,
     mutable_b: bool,
@@ -152,6 +223,17 @@ pub fn clone_agent(
     }
 }
 
+/// Generate new agents through asexual reproduction to maintain a constant population size.
+///
+/// # Arguments
+/// * `population` - A mutable reference to a vector of `Agent` structs representing the population of agents.
+/// * `population_cap` - The maximum population size.
+/// * `mutable_b` - A boolean indicating whether the `b` parameter is mutable.
+/// * `mutable_lmax` - A boolean indicating whether the `lmax` parameter is mutable.
+/// * `b_mutation_rate` - The probability of mutation for the `b` parameter.
+/// * `lmax_mutation_rate` - The probability of mutation for the `lmax` parameter.
+/// * `b_mutation_strength` - The standard deviation of the normal distribution used to sample the mutation value for `b`.
+/// * `lmax_mutation_strength` - The standard deviation of the normal distribution used to sample the mutation value for `lmax`.
 pub fn get_reproduction_population(
     population: &mut Vec<Agent>,
     population_cap: usize,
@@ -181,6 +263,13 @@ pub fn get_reproduction_population(
     population.extend(new_babies);
 }
 
+/// Calculate the mean and variance of the b parameter in the population.
+///
+/// # Arguments
+/// * `population` - A reference to a vector of `Agent` structs representing the population of agents.
+///
+/// # Returns
+/// Returns a tuple containing the mean and variance of the b parameter in the population.
 pub fn get_population_b_stats(population: &Vec<Agent>) -> (f64, f64) {
     let b_values = population
         .iter()
@@ -198,6 +287,13 @@ pub fn get_population_b_stats(population: &Vec<Agent>) -> (f64, f64) {
     (b_mean, b_variance)
 }
 
+/// Calculate the mean and variance of the lmax parameter in the population.
+///
+/// # Arguments
+/// * `population` - A reference to a vector of `Agent` structs representing the population of agents.
+///
+/// # Returns
+/// Returns a tuple containing the mean and variance of the lmax parameter in the population.
 pub fn get_population_lmax_stats(population: &Vec<Agent>) -> (f64, f64) {
     let lmax_values = population
         .iter()
