@@ -45,7 +45,6 @@ fn linspace(start: f64, end: f64, n: usize) -> Vec<f64> {
 }
 
 // FITNESS LANDSCAPE
-
 pub fn survival_l(x:f64, aging_intermediate_closure: &dyn Fn(f64, &[f64], &[f64], &[f64]) -> f64, aging_parameters: &[f64], learning_parameters: &[f64], growth_parameters: &[f64]) -> f64 {
     let cumulative_hazard = integrate(
         |t: f64| -> f64 {

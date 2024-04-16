@@ -5,6 +5,14 @@ use rand_distr::{Distribution, Normal, num_traits::Float};
 use rayon::prelude::*;
 use std::iter::zip;
 
+/// Struct representing an agent in the simulation.
+///
+/// # Fields
+/// * `age` - The current age of the agent in years.
+/// * `female` - A boolean indicating whether the agent is female.
+/// * `aging_parameters` - A vector of floating-point numbers representing parameters for the aging function
+/// * `learning_parameters` - A vector of floating-point numbers representing parameters for learning benefit function.
+/// * `growth_parameters` - A vector of floating-point numbers that represent growth benefit function.
 #[derive(Clone)]
 pub struct Agent {
     pub age: f64,
@@ -14,6 +22,21 @@ pub struct Agent {
     pub growth_parameters: Vec<f64>,
 }
 
+/// Initialize a population of agents with random parameters based on normal distributions.
+///
+/// # Arguments
+/// * `initial_population_size` - The number of agents to create in the population.
+/// * `aging_parameters` - A vector of floating-point numbers representing parameters for the aging function.
+/// * `learning_parameters` - A vector of floating-point numbers representing parameters for the learning benefit function.
+/// * `growth_parameters` - A vector of floating-point numbers that represent growth benefit function.
+/// * `initial_age_distribution` - A two-element array representing the mean and standard deviation of the initial age distribution.
+/// * `initial_b_distribution` - A two-element array representing the mean and standard deviation of the initial b distribution.
+/// * `initial_lmax_distribution` - A two-element array representing the mean and standard deviation of the initial lmax distribution.
+/// * `initial_gmax_distribution` - A two-element array representing the mean and standard deviation of the initial gmax distribution.
+/// * `initial_female_proportion` - The initial proportion of female agents in the population.
+///
+/// # Returns
+/// Returns a vector of agents with random parameters based on the specified distributions.
 pub fn initialize_population<'a, 'b>(
     initial_population_size: usize,
     aging_parameters: &[f64],
@@ -63,6 +86,18 @@ pub fn initialize_population<'a, 'b>(
     population
 }
 
+/// Calculate the probability of death for an agent over a given time step using an aging model.
+///
+/// This function integrates an aging model over a specified time interval to estimate the probability of death.
+/// It utilizes a custom closure that combines aging, learning, and growth parameters of the agent.
+///
+/// # Arguments
+/// * `agent` - A reference to an Agent struct containing the agent's parameters and current age.
+/// * `time_step` - The time interval over which to calculate the probability of death.
+/// * `aging_intermediate_closure` - A closure that computes aging effects using three different parameter sets.
+///
+/// # Returns
+/// Returns the estimated probability of death for the agent over the specified time step.
 pub fn get_proba_of_death_agent(
     agent: &Agent,
     time_step: f64,
@@ -82,6 +117,19 @@ pub fn get_proba_of_death_agent(
     )
 }
 
+/// Determines whether an agent dies during a given time step based on mortality probabilities and additional reproductive conditions.
+/// Agents past menopause are considered non-reproducing and can be removed based on the `remove_non_reproducing` flag.
+///
+/// # Arguments
+/// * `agent` - A reference to the `Agent` struct, representing the agent whose death is being evaluated.
+/// * `time_step` - The time interval over which to calculate the probability of death.
+/// * `aging_intermediate_closure` - A closure that computes the aging effects using the agent's parameters.
+/// * `remove_non_reproducing` - A boolean indicating whether to automatically consider agents past menopause as dead.
+/// * `male_menopause` - The age at which male agents are considered to have reached menopause, influencing their reproductive status.
+/// * `female_menopause` - The age at which female agents are considered to have reached menopause, influencing their reproductive status.
+///
+/// # Returns
+/// Returns `true` if the agent is dead by the end of the time step, otherwise `false`.
 pub fn get_death_agent(
     agent: &Agent,
     time_step: f64,
@@ -101,6 +149,7 @@ pub fn get_death_agent(
     }
     true
 }
+
 
 pub fn get_death_population<F: Fn(f64, &[f64], &[f64], &[f64]) -> f64 + Send + Sync>(
     population: &mut Vec<Agent>,
