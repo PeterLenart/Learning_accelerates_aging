@@ -11,13 +11,18 @@ use csv::Writer;
 // use peroxide::numerical::integral::{gauss_kronrod_quadrature, integrate};
 
 fn main() {
+
+    // Define overall parameters
     let time_step = 1.0;
     let initial_female_proportion = 0.5;
     let minimum_mortality = 1e-5;
+
+    // Define GLA parameters
     let aging_parameters = [0.00275961297460256,0.04326224872667336,0.025201676835511704] ;
     let learning_parameters = [0.01606792505529796,39.006865144958745,0.11060749334680318];
     let growth_parameters: [f64; 2] = [0.05168141300917714,0.08765165352033985];
 
+    // Define intermediate aging closure
     let aging_intermediate_closure = |x: f64,
                                       aging_parameters: &[f64],
                                       learning_parameters: &[f64],
@@ -35,15 +40,18 @@ fn main() {
         )
     };
 
+    // Define initial distributions
     let initial_age_distribution = [20.0, 10.0];
     let initial_b_distribution = [0.14, 0.005];
     let mut initial_lmax_distribution = [2.0, 0.0];
 
+    // Define simulation parameters
     let population_cap = 10000;
     let simulation_time : usize = 10000;
     let replicate_number = 100;
     let assortative_mating = false;
 
+    // Define mutation parameters
     let mutable_b = true;
     let mutable_lmax = false;
     let b_mutation_rate: f64 = 0.02;
@@ -51,6 +59,7 @@ fn main() {
     let b_mutation_strength = 0.012;
     let lmax_mutation_strength = 0.012;
 
+    // Boilerplate to name the output file based on the simulation parameters
     let base_name_part = "asexual_test";
     let mut learning_name_part = "with_learning";
     let mut mating_name_part = "random_mating";
@@ -59,6 +68,7 @@ fn main() {
         mating_name_part = "assortative_mating";
     }
 
+    // Run the simulation
     println!("######################################");
     println!("###### Simulation with learning ######");
     println!("######################################");
@@ -91,37 +101,37 @@ fn main() {
         )
     }
 
-    // println!("#########################################");
-    // println!("###### Simulation without learning ######");
-    // println!("#########################################");
-    // initial_lmax_distribution = [0.0, 0.0];
-    // learning_name_part = "no_learning";
+    println!("#########################################");
+    println!("###### Simulation without learning ######");
+    println!("#########################################");
+    initial_lmax_distribution = [0.0, 0.0];
+    learning_name_part = "no_learning";
 
-    // let output_file_name = format!("./simulation_results/{}_{}_{}.csv", base_name_part, mating_name_part, learning_name_part);
-    // let mut wtr = Writer::from_path(output_file_name).unwrap();
+    let output_file_name = format!("./simulation_results/{}_{}_{}.csv", base_name_part, mating_name_part, learning_name_part);
+    let mut wtr = Writer::from_path(output_file_name).unwrap();
 
 
-    // for i in 0..replicate_number {
-    //     println!("Replicate : {}/{}", i + 1, replicate_number);
-    //     run_simulation(
-    //         &mut wtr,
-    //         population_cap,
-    //         simulation_time,
-    //         i,
-    //         &aging_parameters,
-    //         &learning_parameters,
-    //         &growth_parameters,
-    //         initial_age_distribution,
-    //         initial_b_distribution,
-    //         initial_lmax_distribution,
-    //         time_step,
-    //         mutable_b,
-    //         mutable_lmax,
-    //         b_mutation_rate,
-    //         lmax_mutation_rate,
-    //         b_mutation_strength,
-    //         lmax_mutation_strength,
-    //         aging_intermediate_closure,
-    //     )
-    // }
+    for i in 0..replicate_number {
+        println!("Replicate : {}/{}", i + 1, replicate_number);
+        run_simulation(
+            &mut wtr,
+            population_cap,
+            simulation_time,
+            i,
+            &aging_parameters,
+            &learning_parameters,
+            &growth_parameters,
+            initial_age_distribution,
+            initial_b_distribution,
+            initial_lmax_distribution,
+            time_step,
+            mutable_b,
+            mutable_lmax,
+            b_mutation_rate,
+            lmax_mutation_rate,
+            b_mutation_strength,
+            lmax_mutation_strength,
+            aging_intermediate_closure,
+        )
+    }
 }

@@ -5,19 +5,19 @@ use crate::gla_package::{gla::{
     growth_function, learning_function, constant_fertility,
 }, simulate::run_simulation};
 
-// use easybench::bench;
-
-// use peroxide::fuga::{GaussLegendre, G7K15R};
-// use peroxide::numerical::integral::{gauss_kronrod_quadrature, integrate};
-
 fn main() {
+
+    // Define overall parameters
     let time_step = 1.0;
     let initial_female_proportion = 0.5;
     let minimum_mortality = 1e-5;
+
+    // Define GLA parameters
     let aging_parameters = [0.00275961297460256,0.04326224872667336,0.025201676835511704] ;
     let learning_parameters = [0.01606792505529796,39.006865144958745,0.11060749334680318];
     let growth_parameters: [f64; 2] = [0.05168141300917714,0.08765165352033985];
 
+    // Define fertility parameters
     let female_fertility_parameters = [1.0];
     let male_fertility_parameters = [1.0];
 
@@ -37,6 +37,7 @@ fn main() {
     // let female_fertility_function = fertility_brass_polynomial;
     // let male_fertility_function = fertility_brass_polynomial;
 
+    // Define normalized fertility closures
     let female_maximum_fertility = find_maximum_fertility(
         &female_fertility_function,
         &female_fertility_parameters,
@@ -54,6 +55,7 @@ fn main() {
             .min(1.0)
     });
 
+    // Define aging intermediate closure
     let aging_intermediate_closure = |x: f64,
                                       aging_parameters: &[f64],
                                       learning_parameters: &[f64],
@@ -75,11 +77,14 @@ fn main() {
     // ############# Simulation with learning ################
     // #######################################################
 
+    // Define initial distributions
     let initial_age_distribution = [20.0, 10.0];
     let initial_b_distribution = [0.14, 0.005];
     let mut initial_lmax_distribution = [0.15, 0.0];
     let mut initial_gmax_distribution = [0.05168141300917714, 0.0]; 
     // let mut initial_gmax_distribution = [0.055, 0.0]
+
+    // Define simulation parameters
     let population_cap = 10000;
     let simulation_time : usize = 600000;
     let replicate_number = 5;
@@ -88,6 +93,7 @@ fn main() {
     let tradeoff = false;
     let start_b = initial_b_distribution[0];
 
+    // Define mutation parameters
     let mutable_b = true;
     let mutable_lmax = false;
     let mutable_gmax = false;
@@ -98,6 +104,7 @@ fn main() {
     let lmax_mutation_strength = 0.012;
     let gmax_mutation_strength = 0.012;
 
+    // Boilerplate to name the output file based on the simulation parameters
     // let base_name_part = "plateau_brass_polynomial_different";
     let base_name_part = "constant_fertility";
     let mut learning_name_part = "with_learning";
@@ -117,6 +124,7 @@ fn main() {
         removal_name_part = "non_reproducing_removed";
     }
 
+    // Run the simulation
     println!("######################################");
     println!("###### Simulation with learning ######");
     println!("######################################");
@@ -147,12 +155,15 @@ fn main() {
 //     // ############### Simulation with growth ###############
 //     // ######################################################
 
+//     // Define initial distributions
 //     let initial_age_distribution = [20.0, 10.0];
 //     let initial_b_distribution = [0.14, 0.005];
 //     // let mut initial_lmax_distribution = [0.15, 0.0];
 //     let initial_lmax_distribution = [0.01606792505529796, 0.0];
 //     // let mut initial_gmax_distribution = [0.05168141300917714, 0.0]; 
 //     let mut initial_gmax_distribution = [0.175, 0.0];
+
+//     // Define simulation parameters
 //     let population_cap = 10000;
 //     let simulation_time : usize = 1000;
 //     let replicate_number = 500;
@@ -161,6 +172,7 @@ fn main() {
 //     let tradeoff = false;
 //     let start_b = initial_b_distribution[0];
 
+//     // Define mutation parameters
 //     let mutable_b = true;
 //     let mutable_lmax = false;
 //     let mutable_gmax = false;
@@ -171,6 +183,7 @@ fn main() {
 //     let lmax_mutation_strength = 0.012;
 //     let gmax_mutation_strength = 0.012;
 
+//     // Boilerplate to name the output file based on the simulation parameters
 //     // let base_name_part = "plateau_brass_polynomial_equal_both";
 //     let base_name_part = "early_slope_brass_polynomial_equal_both";
 //     let mut growth_name_part = "high_growth";
@@ -190,6 +203,7 @@ fn main() {
 //         removal_name_part = "non_reproducing_removed";
 //     }
 
+//     // Run the simulation
 //     println!("######################################");
 //     println!("###### Simulation with high Gmax ######");
 //     println!("######################################");
