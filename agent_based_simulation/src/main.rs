@@ -18,8 +18,12 @@ fn main() {
     // let growth_parameters: [f64; 2] = [0.05168141300917714,0.08765165352033985];
 
     // Define toy model parameters
-    let aging_parameters = [1.0, 1.0];
-    let improvement_parameters = [0.0, 15.0, 0.5];
+    let aging_parameters = [0.01, 0.02];
+    // Hijacking the learning parameters as the improvement parameters for the toy model
+    let learning_parameters = [0.5, 0.0, 15.0];
+    // The growth parameters are not used in the toy model
+    let growth_parameters = [1.0, 1.0];
+
 
     // Define fertility parameters
     let female_fertility_parameters = [1.0];
@@ -106,7 +110,7 @@ fn main() {
     // let mut initial_lmax_distribution = [0.15, 0.0];
     // let mut initial_gmax_distribution = [0.05168141300917714, 0.0]; 
     // let mut initial_gmax_distribution = [0.055, 0.0]
-    
+
     // Define initial distributions for the toy model
     let initial_age_distribution = [20.0, 10.0];
     let initial_b_distribution = [1.0, 0.0];
@@ -135,8 +139,9 @@ fn main() {
 
     // Boilerplate to name the output file based on the simulation parameters
     // let base_name_part = "plateau_brass_polynomial_different";
-    let base_name_part = "constant_fertility";
-    let mut learning_name_part = "with_learning";
+    let base_name_part = "toy_model_constant_fertility_0_15";
+    // let mut learning_name_part = "with_learning";
+    let mut learning_name_part = "with_improvement";
     let mut mating_name_part = "random_mating";
     let mut removal_name_part = "non_reproducing_kept";
     let mut tradeoff_name_part = "no_tradeoff";
@@ -170,7 +175,8 @@ fn main() {
     println!("###### Simulation without learning ######");
     println!("#########################################");
     initial_lmax_distribution = [0.0, 0.0];
-    learning_name_part = "no_learning";
+    // learning_name_part = "no_learning";
+    learning_name_part = "no_improvement";
 
     let output_file_name = format!("./simulation_results/{}_{}_{}_{}_{}.csv", base_name_part, mating_name_part, learning_name_part, removal_name_part, tradeoff_name_part);
     let mut wtr = Writer::from_path(output_file_name).unwrap();

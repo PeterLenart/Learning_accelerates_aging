@@ -116,6 +116,7 @@ pub fn survival_l(x:f64, aging_intermediate_closure: &dyn Fn(f64, &[f64], &[f64]
 /// * `growth_parameters` - The growth parameters.
 /// * `fertility_closure` - A closure that computes the fertility function.
 pub fn euler_lotka_function(r: f64, aging_intermediate_closure: &dyn Fn(f64, &[f64], &[f64], &[f64]) -> f64, aging_parameters: &[f64], learning_parameters: &[f64], growth_parameters: &[f64], fertility_closure: &dyn Fn(f64) -> f64) -> f64 {
+    /// Compute the cumulative hazard function at x. The integration method can be changed for better accuracy or faster computation.
     let integral = integrate(
         |t: f64| -> f64 {
             fertility_closure(t) * survival_l(
