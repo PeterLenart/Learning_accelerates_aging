@@ -222,7 +222,7 @@ where
     let aging = aging_func(x, aging_parameters);
     let improvement = improvement_func(x, improvement_parameters);
 
-    let result aging * improvement;
+    let result = aging * improvement;
 
     if result < minimum_mortality {
         minimum_mortality
