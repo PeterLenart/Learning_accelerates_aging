@@ -1,7 +1,7 @@
 mod gla_package;
 use crate::gla_package::{gla::{
     aging_gompertz_makeham, fertility_brass_polynomial, constant_fertility, gla_model,
-    growth_function, learning_function, _aging_gompertz, toy_model, mortality_improvement_function,
+    growth_function, learning_function, _aging_gompertz, toy_model, mortality_improvement_function, step_fertility,
 }, landscape::{generate_grids, compute_fitness_grid_parallel_lmax, compute_fitness_grid_parallel_gmax, compute_fitness_grid_point_lmax, compute_fitness_grid_point_gmax}};
 use ndarray::{Array2, Array1, stack, Axis, s};
 use std::error::Error;
@@ -87,8 +87,11 @@ fn main() -> Result<(), Box<dyn Error>>{
     // let fertility_parameters = [2.445e-5, 14.8, 32.836];
     // let fertility_function = fertility_brass_polynomial;
 
-    let fertility_parameters = [1f64];
-    let fertility_function = constant_fertility;
+    // let fertility_parameters = [1f64];
+    // let fertility_function = constant_fertility;
+
+    let fertility_parameters = [1f64, 15.0, 100.0];
+    let fertility_function = step_fertility;
 
     // let fertility_parameters = [0.1f64, 0.1];
     // let fertility_function = linear_fertility;
