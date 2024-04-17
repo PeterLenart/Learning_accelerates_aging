@@ -15,6 +15,16 @@ fn main() -> Result<(), Box<dyn Error>>{
     // Generate two regular grids of b and lmax values, a base grid and a grid where b is reduced by some factor
     let dim = 200;
     
+    // let (base_b_grid, reduced_b_grid) = generate_grids(
+    //     "regular",
+    //     1e-5, 
+    //     0.14, 
+    //     0.0, 
+    //     0.20,
+    //     dim,
+    //     0.95,
+    // );
+
     let (base_b_grid, reduced_b_grid) = generate_grids(
         "regular",
         1e-5, 
@@ -27,35 +37,58 @@ fn main() -> Result<(), Box<dyn Error>>{
 
     // Define GLA parameters
     let minimum_mortality = 1e-5f64;
-    let aging_parameters = [0.00275961297460256,0.04326224872667336,0.025201676835511704] ;
-    let learning_parameters = [0.01606792505529796,39.006865144958745,0.11060749334680318];
-    // let learning_parameters = [0.01606792505529796, 35.0,0.11060749334680318];
-    let growth_parameters: [f64; 2] = [0.05168141300917714,0.08765165352033985];
+    // let aging_parameters = [0.00275961297460256,0.04326224872667336,0.025201676835511704] ;
+    // let learning_parameters = [0.01606792505529796,39.006865144958745,0.11060749334680318];
+    // // let learning_parameters = [0.01606792505529796, 35.0,0.11060749334680318];
+    // let growth_parameters: [f64; 2] = [0.05168141300917714,0.08765165352033985];
+
+    // Define toy model parameters
+    let aging_parameters = [0.01, 0.02];
+    // Hijacking the learning parameters as the improvement parameters for the toy model
+    let learning_parameters = [0.5, 0.0, 15.0];
+    // The growth parameters are not used in the toy model
+    let growth_parameters = [1.0, 1.0];
 
     // Define intermediate aging closure
+    // let aging_intermediate_closure = |x: f64,
+    //                                   aging_parameters: &[f64],
+    //                                   learning_parameters: &[f64],
+    //                                   growth_parameters: &[f64]|
+    //  -> f64 {
+    //     gla_model(
+    //         x,
+    //         aging_gompertz_makeham as fn(f64, &[f64]) -> f64,
+    //         learning_function,
+    //         growth_function,
+    //         &aging_parameters,
+    //         &learning_parameters,
+    //         &growth_parameters,
+    //         minimum_mortality,
+    //     )
+    // };
+
+    // Dirty hack to use toy model, the growth parameters are not used
     let aging_intermediate_closure = |x: f64,
                                       aging_parameters: &[f64],
-                                      learning_parameters: &[f64],
+                                      improvement_parameters: &[f64],
                                       growth_parameters: &[f64]|
      -> f64 {
-        gla_model(
+        toy_model(
             x,
-            aging_gompertz_makeham as fn(f64, &[f64]) -> f64,
-            learning_function,
-            growth_function,
+            _aging_gompertz as fn(f64, &[f64]) -> f64,
+            mortality_improvement_function,
             &aging_parameters,
-            &learning_parameters,
-            &growth_parameters,
+            &improvement_parameters,
             minimum_mortality,
         )
     };
 
     // Define fertility parameters
-    let fertility_parameters = [2.445e-5, 14.8, 32.836];
-    let fertility_function = fertility_brass_polynomial;
+    // let fertility_parameters = [2.445e-5, 14.8, 32.836];
+    // let fertility_function = fertility_brass_polynomial;
 
-    // let fertility_parameters = [1f64];
-    // let fertility_function = constant_fertility;
+    let fertility_parameters = [1f64];
+    let fertility_function = constant_fertility;
 
     // let fertility_parameters = [0.1f64, 0.1];
     // let fertility_function = linear_fertility;
