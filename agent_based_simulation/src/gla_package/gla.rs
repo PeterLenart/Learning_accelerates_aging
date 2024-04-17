@@ -125,6 +125,38 @@ pub fn constant_fertility(_x: f64, fertility_parameters: &[f64]) -> f64 {
     c
 }
 
+/// Calculate the fertility based on a step fertility model.
+///
+/// # Arguments
+/// * `x` - The age at which to calculate the fertility rate.
+/// * `fertility_parameters` - An array containing the parameters for the step fertility model:
+///     - `fertility_parameters[0]` (c): The constant fertility rate.
+///     - `fertility_parameters[1]` (start): The age at which fertility begins.
+///     - `fertility_parameters[2]` (end): The age at which fertility ends.
+///
+/// # Returns
+/// Returns the fertility rate at the input `x`, calculated using the provided `c`, `start`, and `end`.
+pub fn step_fertility(x: f64, fertility_parameters: &[f64]) -> f64 {
+    let (c, start, end) = (
+        fertility_parameters[0],
+        fertility_parameters[1],
+        fertility_parameters[2],
+    );
+    if end.is_infinite() {
+        if x >= start {
+            c
+        } else {
+            0_f64
+        }
+    } else {
+        if (x >= start) && (x <= end) {
+            c
+        } else {
+            0_f64
+        }
+    }
+}
+
 /// Calculate mortality based on the GLA model.
 ///
 /// # Arguments
@@ -192,7 +224,7 @@ pub fn mortality_improvement_function(x: f64, improvement_parameters: &[f64]) ->
         }
     } else {
         if (x >= start) && (x <= end) {
-            1-factor
+            1_f64-factor
         } else {
             1_f64
         }
@@ -222,7 +254,7 @@ where
     let aging = aging_func(x, aging_parameters);
     let improvement = improvement_func(x, improvement_parameters);
 
-    let result aging * improvement;
+    let result = aging * improvement;
 
     if result < minimum_mortality {
         minimum_mortality

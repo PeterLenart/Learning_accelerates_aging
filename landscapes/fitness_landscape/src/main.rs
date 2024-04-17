@@ -13,7 +13,7 @@ fn main() -> Result<(), Box<dyn Error>>{
     // LMAX GRID
 
     // Generate two regular grids of b and lmax values, a base grid and a grid where b is reduced by some factor
-    let dim = 200;
+    let dim = 500;
     
     // let (base_b_grid, reduced_b_grid) = generate_grids(
     //     "regular",
@@ -28,7 +28,7 @@ fn main() -> Result<(), Box<dyn Error>>{
     let (base_b_grid, reduced_b_grid) = generate_grids(
         "regular",
         1e-5, 
-        0.15, 
+        0.1, 
         0.0, 
         1.0,
         dim,
@@ -45,7 +45,7 @@ fn main() -> Result<(), Box<dyn Error>>{
     // Define toy model parameters
     let aging_parameters = [0.01, 0.02];
     // Hijacking the learning parameters as the improvement parameters for the toy model
-    let learning_parameters = [0.5, 0.0, 15.0];
+    let learning_parameters = [0.5, 30.0, 40.0];
     // The growth parameters are not used in the toy model
     let growth_parameters = [1.0, 1.0];
 
@@ -102,7 +102,7 @@ fn main() -> Result<(), Box<dyn Error>>{
     let fitness_base_b = compute_fitness_grid_parallel_lmax(&base_b_grid, &aging_intermediate_closure, &aging_parameters, &learning_parameters, &growth_parameters, &fertility_closure);
     
     // Save result
-    let output_file_name = "./output/toy_model_landscapes/csv/fitness_0_15.csv";
+    let output_file_name = "./output/toy_model_landscapes/csv/fitness_30_40.csv";
 
     // Combine the grid and fitness difference into one array
     let fitness_base_b_reshaped = fitness_base_b.clone().insert_axis(Axis(1));
@@ -129,7 +129,7 @@ fn main() -> Result<(), Box<dyn Error>>{
     let fitness_difference = fitness_reduced_b - fitness_base_b;
 
     // Save result
-    let output_file_name = "./output/toy_model_landscapes/csv/fitness_difference_0_15.csv";
+    let output_file_name = "./output/toy_model_landscapes/csv/fitness_difference_30_40.csv";
 
     // Combine the grid and fitness difference into one array
     let fitness_difference_reshaped = fitness_difference.insert_axis(Axis(1));
