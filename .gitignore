@@ -49,3 +49,4 @@ runs/
 */output
 */simulation_results
 /landscapes/fitness_landscape/target/
+/landscapes/fitness_landscape/output/
