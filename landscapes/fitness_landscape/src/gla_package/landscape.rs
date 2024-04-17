@@ -174,7 +174,15 @@ pub fn compute_fitness(aging_intermediate_closure: &dyn Fn(f64, &[f64], &[f64], 
 /// * `growth_parameters` - The growth parameters.
 /// * `fertility_closure` - A closure that computes the fertility function.
 pub fn compute_fitness_grid_point_lmax(grid_point: Vec<f64>, aging_intermediate_closure: &dyn Fn(f64, &[f64], &[f64], &[f64]) -> f64, aging_parameters: &[f64], learning_parameters: &[f64], growth_parameters: &[f64], fertility_closure: &dyn Fn(f64) -> f64) -> f64 {
-    let new_aging_parameters = [aging_parameters[0], grid_point[0], aging_parameters[2]];
+    let new_aging_parameters: Vec<f64> = match aging_parameters.len() {
+        1 => vec![grid_point[0]],
+        2 => vec![aging_parameters[0], grid_point[0]],
+        _ => {
+            let mut temp = vec![aging_parameters[0], grid_point[0]];
+            temp.extend(&aging_parameters[2..]);
+            temp
+        }
+    };
     let new_learning_parameters = [grid_point[1], learning_parameters[1], learning_parameters[2]];
     compute_fitness(
         aging_intermediate_closure,

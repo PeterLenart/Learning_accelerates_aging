@@ -28,9 +28,9 @@ fn main() -> Result<(), Box<dyn Error>>{
     let (base_b_grid, reduced_b_grid) = generate_grids(
         "regular",
         1e-5, 
-        0.14, 
+        0.15, 
         0.0, 
-        0.20,
+        1.0,
         dim,
         0.95,
     );
