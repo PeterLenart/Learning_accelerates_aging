@@ -128,8 +128,8 @@ pub fn euler_lotka_function(r: f64, aging_intermediate_closure: &dyn Fn(f64, &[f
             ) * (-r * t).exp()
         },
         (0.0, 1000.0),
-        GaussLegendre(16),
-        // G7K15(1e-8, 100),
+        // GaussLegendre(16),
+        G7K15(1e-8, 100),
     );
     integral - 1.0
 }
