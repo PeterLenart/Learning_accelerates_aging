@@ -2,7 +2,7 @@ mod gla_package;
 use csv::Writer;
 use crate::gla_package::{gla::{
     aging_gompertz_makeham, fertility_brass_polynomial, find_maximum_fertility, gla_model,
-    growth_function, learning_function, constant_fertility, mortality_improvement_function, toy_model, _aging_gompertz,
+    growth_function, learning_function, constant_fertility, mortality_improvement_function, toy_model, _aging_gompertz,step_fertility
 }, simulate::run_simulation};
 
 fn main() {
@@ -20,32 +20,46 @@ fn main() {
     // Define toy model parameters
     let aging_parameters = [0.01, 0.02];
     // Hijacking the learning parameters as the improvement parameters for the toy model
-    let learning_parameters = [0.5, 0.0, 15.0];
+    let learning_parameters = [0.2, 0.0, 10.0];
     // The growth parameters are not used in the toy model
     let growth_parameters = [1.0, 1.0];
 
 
-    // Define fertility parameters
-    let female_fertility_parameters = [1.0];
-    let male_fertility_parameters = [1.0];
+    // // Define fertility parameters
+    // let female_fertility_parameters = [1.0];
+    // let male_fertility_parameters = [1.0];
 
-    let female_fertility_function = constant_fertility;
-    let male_fertility_function = constant_fertility;
+    // let female_fertility_function = constant_fertility;
+    // let male_fertility_function = constant_fertility;
+
+    // let female_menopause : f64 = 0f64;
+    // let male_menopause : f64 = 0f64;
+
+    // let female_maximum_fertility = 1.0;
+    // let male_maximum_fertility = 1.0;
+
+    let female_fertility_parameters = [1.0, 15.0, 100.0];
+    let male_fertility_parameters = [1.0, 15.0, 100.0];
+
+    let female_fertility_function = step_fertility;
+    let male_fertility_function = step_fertility;
+
+    let female_menopause = female_fertility_parameters[2];
+    let male_menopause = male_fertility_parameters[2];
+
+    let female_maximum_fertility = female_fertility_parameters[0];
+    let male_maximum_fertility = male_fertility_parameters[0];
 
     // let female_fertility_parameters = [2.445e-5, 14.8, 32.836];
     // let male_fertility_parameters = [2.445e-5, 14.8, 32.836];
     // let male_fertility_parameters = [0.00000978, 14.8, 47.836];
 
-    // let female_menopause = female_fertility_parameters[1] + female_fertility_parameters[2];
-    // let male_menopause = male_fertility_parameters[1] + male_fertility_parameters[2];
-
-    let female_menopause : f64 = 0f64;
-    let male_menopause : f64 = 0f64;
-
     // let female_fertility_function = fertility_brass_polynomial;
     // let male_fertility_function = fertility_brass_polynomial;
 
-    // Define normalized fertility closures
+    // let female_menopause = female_fertility_parameters[1] + female_fertility_parameters[2];
+    // let male_menopause = male_fertility_parameters[1] + male_fertility_parameters[2];
+
     // let female_maximum_fertility = find_maximum_fertility(
     //     &female_fertility_function,
     //     &female_fertility_parameters,
@@ -54,9 +68,7 @@ fn main() {
     // let male_maximum_fertility =
     //     find_maximum_fertility(&male_fertility_function, &male_fertility_parameters, 20.0);
 
-    let female_maximum_fertility = 1.0;
-    let male_maximum_fertility = 1.0;
-
+    // Define normalized fertility closures
     let normalized_male_fertility_closure = Box::new(|x: f64| -> f64 {
         (male_fertility_function(x, &male_fertility_parameters) / male_maximum_fertility).min(1.0)
     });
@@ -114,13 +126,13 @@ fn main() {
     // Define initial distributions for the toy model
     let initial_age_distribution = [20.0, 10.0];
     let initial_b_distribution = [1.0, 0.0];
-    let initial_lmax_distribution = [0.5, 0.0];
+    let initial_lmax_distribution = [0.2, 0.0];
     let initial_gmax_distribution = [1.0, 0.0];
 
     // Define simulation parameters
     let population_cap = 10000;
-    let simulation_time : usize = 600000;
-    let replicate_number = 5;
+    let simulation_time : usize = 1000;
+    let replicate_number = 100;
     let assortative_mating = false;
     let remove_non_reproducing = false;
     let tradeoff = false;
@@ -139,7 +151,10 @@ fn main() {
 
     // Boilerplate to name the output file based on the simulation parameters
     // let base_name_part = "plateau_brass_polynomial_different";
-    let base_name_part = "toy_model_constant_fertility_0_15";
+    // let base_name_part = "toy_model_constant_fertility_0_10";
+    // Name the output file based on the simulation parameters
+    let base_name_part = format!("slope_toy_model_step_fertility_{}_{}", learning_parameters[1], learning_parameters[2]);
+
     // let mut learning_name_part = "with_learning";
     let mut learning_name_part = "with_improvement";
     let mut mating_name_part = "random_mating";
