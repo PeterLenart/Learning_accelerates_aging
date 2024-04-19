@@ -18,14 +18,14 @@ fn main() {
     // let growth_parameters: [f64; 2] = [0.05168141300917714,0.08765165352033985];
 
     // Define toy model parameters
-    let aging_parameters = [0.01, 0.02];
+    let aging_parameters = [0.01, 0.1];
     // Hijacking the learning parameters as the improvement parameters for the toy model
-    let learning_parameters = [0.2, 0.0, 10.0];
+    let learning_parameters = [0.5, 45.0, 55.0];
     // The growth parameters are not used in the toy model
     let growth_parameters = [1.0, 1.0];
 
 
-    // // Define fertility parameters
+    // Define fertility parameters
     // let female_fertility_parameters = [1.0];
     // let male_fertility_parameters = [1.0];
 
@@ -125,16 +125,16 @@ fn main() {
 
     // Define initial distributions for the toy model
     let initial_age_distribution = [20.0, 10.0];
-    let initial_b_distribution = [1.0, 0.0];
-    let initial_lmax_distribution = [0.2, 0.0];
+    let initial_b_distribution = [0.1, 0.0];
+    let mut initial_lmax_distribution = [0.2, 0.0];
     let initial_gmax_distribution = [1.0, 0.0];
 
     // Define simulation parameters
     let population_cap = 10000;
     let simulation_time : usize = 1000;
-    let replicate_number = 100;
+    let replicate_number = 500;
     let assortative_mating = false;
-    let remove_non_reproducing = false;
+    let remove_non_reproducing = true;
     let tradeoff = false;
     let start_b = initial_b_distribution[0];
 
@@ -153,7 +153,7 @@ fn main() {
     // let base_name_part = "plateau_brass_polynomial_different";
     // let base_name_part = "toy_model_constant_fertility_0_10";
     // Name the output file based on the simulation parameters
-    let base_name_part = format!("slope_toy_model_step_fertility_{}_{}", learning_parameters[1], learning_parameters[2]);
+    let base_name_part = format!("early_slope_toy_model_step_fertility_{}_{}", learning_parameters[1], learning_parameters[2]);
 
     // let mut learning_name_part = "with_learning";
     let mut learning_name_part = "with_improvement";
@@ -178,7 +178,7 @@ fn main() {
     println!("###### Simulation with learning ######");
     println!("######################################");
 
-    let output_file_name = format!("./simulation_results/{}_{}_{}_{}_{}_{}.csv", base_name_part, mating_name_part, learning_name_part, removal_name_part, tradeoff_name_part,initial_lmax_distribution[0]);
+    let output_file_name = format!("./simulation_results/toy_model_simulations/{}_{}_{}_{}_{}_{}.csv", base_name_part, mating_name_part, learning_name_part, removal_name_part, tradeoff_name_part,initial_lmax_distribution[0]);
     let mut wtr = Writer::from_path(output_file_name).unwrap();
 
     for i in 0..replicate_number{
@@ -186,20 +186,20 @@ fn main() {
         run_simulation(&mut wtr, population_cap, simulation_time, i, assortative_mating, &aging_parameters, &learning_parameters, &growth_parameters, initial_age_distribution, initial_b_distribution, initial_lmax_distribution, initial_gmax_distribution, initial_female_proportion, time_step, mutable_b, mutable_lmax, mutable_gmax, b_mutation_rate, lmax_mutation_rate, gmax_mutation_rate, b_mutation_strength, lmax_mutation_strength, gmax_mutation_strength, aging_intermediate_closure, &normalized_male_fertility_closure, &normalized_female_fertility_closure, tradeoff, start_b, remove_non_reproducing, male_menopause, female_menopause)
     }
 
-    println!("#########################################");
-    println!("###### Simulation without learning ######");
-    println!("#########################################");
-    initial_lmax_distribution = [0.0, 0.0];
-    // learning_name_part = "no_learning";
-    learning_name_part = "no_improvement";
+    // println!("#########################################");
+    // println!("###### Simulation without learning ######");
+    // println!("#########################################");
+    // initial_lmax_distribution = [0.0, 0.0];
+    // // learning_name_part = "no_learning";
+    // learning_name_part = "no_improvement";
 
-    let output_file_name = format!("./simulation_results/{}_{}_{}_{}_{}.csv", base_name_part, mating_name_part, learning_name_part, removal_name_part, tradeoff_name_part);
-    let mut wtr = Writer::from_path(output_file_name).unwrap();
+    // let output_file_name = format!("./simulation_results/toy_model_simulations/{}_{}_{}_{}_{}.csv", base_name_part, mating_name_part, learning_name_part, removal_name_part, tradeoff_name_part);
+    // let mut wtr = Writer::from_path(output_file_name).unwrap();
 
-    for i in 0..replicate_number{
-        println!("Replicate : {}/{}", i+1, replicate_number);
-        run_simulation(&mut wtr, population_cap, simulation_time, i, assortative_mating, &aging_parameters, &learning_parameters, &growth_parameters, initial_age_distribution, initial_b_distribution, initial_lmax_distribution, initial_gmax_distribution, initial_female_proportion, time_step, mutable_b, mutable_lmax, mutable_gmax, b_mutation_rate, lmax_mutation_rate, gmax_mutation_rate, b_mutation_strength, lmax_mutation_strength, gmax_mutation_strength, aging_intermediate_closure, &normalized_male_fertility_closure, &normalized_female_fertility_closure, tradeoff, start_b, remove_non_reproducing, male_menopause, female_menopause)
-    }
+    // for i in 0..replicate_number{
+    //     println!("Replicate : {}/{}", i+1, replicate_number);
+    //     run_simulation(&mut wtr, population_cap, simulation_time, i, assortative_mating, &aging_parameters, &learning_parameters, &growth_parameters, initial_age_distribution, initial_b_distribution, initial_lmax_distribution, initial_gmax_distribution, initial_female_proportion, time_step, mutable_b, mutable_lmax, mutable_gmax, b_mutation_rate, lmax_mutation_rate, gmax_mutation_rate, b_mutation_strength, lmax_mutation_strength, gmax_mutation_strength, aging_intermediate_closure, &normalized_male_fertility_closure, &normalized_female_fertility_closure, tradeoff, start_b, remove_non_reproducing, male_menopause, female_menopause)
+    // }
 
 //     // ######################################################
 //     // ############### Simulation with growth ###############
