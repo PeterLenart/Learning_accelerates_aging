@@ -20,7 +20,7 @@ fn main() {
     // Define toy model parameters
     let aging_parameters = [0.01, 0.1];
     // Hijacking the learning parameters as the improvement parameters for the toy model
-    let learning_parameters = [0.5, 45.0, 55.0];
+    let learning_parameters = [45.0, f64::INFINITY, 0.2];
     // The growth parameters are not used in the toy model
     let growth_parameters = [1.0, 1.0];
 
@@ -153,7 +153,7 @@ fn main() {
     // let base_name_part = "plateau_brass_polynomial_different";
     // let base_name_part = "toy_model_constant_fertility_0_10";
     // Name the output file based on the simulation parameters
-    let base_name_part = format!("early_slope_toy_model_step_fertility_{}_{}", learning_parameters[1], learning_parameters[2]);
+    let base_name_part = format!("early_slope_toy_model_step_fertility_{}_{}", learning_parameters[0], learning_parameters[2]);
 
     // let mut learning_name_part = "with_learning";
     let mut learning_name_part = "with_improvement";
