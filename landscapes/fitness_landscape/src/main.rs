@@ -30,7 +30,7 @@ fn main() -> Result<(), Box<dyn Error>>{
         1e-5, 
         0.1, 
         0.0, 
-        1.0,
+        100.0,
         dim,
         0.95,
     );
@@ -107,7 +107,7 @@ fn main() -> Result<(), Box<dyn Error>>{
     // Save result
     // let output_file_name = "./output/toy_model_landscapes/csv/fitness_40_50.csv";
     // Name the output file based on the parameters
-    let output_file_name = format!("./output/toy_model_landscapes/csv/fitness_{}_{}.csv", learning_parameters[0], learning_parameters[2]);
+    let output_file_name = format!("./output/toy_model_landscapes/csv/fitness_{}.csv", learning_parameters[2]);
 
     // Combine the grid and fitness difference into one array
     let fitness_base_b_reshaped = fitness_base_b.clone().insert_axis(Axis(1));
@@ -136,7 +136,7 @@ fn main() -> Result<(), Box<dyn Error>>{
     // Save result
     // let output_file_name = "./output/toy_model_landscapes/csv/fitness_difference_40_50.csv";
     // Name the output file based on the parameters
-    let output_file_name = format!("./output/toy_model_landscapes/csv/fitness_difference_{}_{}.csv", learning_parameters[0], learning_parameters[2]);
+    let output_file_name = format!("./output/toy_model_landscapes/csv/fitness_difference_{}.csv", learning_parameters[2]);
 
     // Combine the grid and fitness difference into one array
     let fitness_difference_reshaped = fitness_difference.insert_axis(Axis(1));
