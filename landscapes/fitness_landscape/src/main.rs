@@ -13,7 +13,7 @@ fn main() -> Result<(), Box<dyn Error>>{
     // LMAX GRID
 
     // Generate two regular grids of b and lmax values, a base grid and a grid where b is reduced by some factor
-    let dim = 500;
+    let dim = 200;
     
     // let (base_b_grid, reduced_b_grid) = generate_grids(
     //     "regular",
@@ -30,7 +30,7 @@ fn main() -> Result<(), Box<dyn Error>>{
         1e-5, 
         0.1, 
         0.0, 
-        100.0,
+        60.0,
         dim,
         0.95,
     );
@@ -45,7 +45,7 @@ fn main() -> Result<(), Box<dyn Error>>{
     // Define toy model parameters
     let aging_parameters = [0.01, 0.02];
     // Hijacking the learning parameters as the improvement parameters for the toy model
-    let learning_parameters = [0.0, f64::INFINITY, 0.2];
+    let learning_parameters = [0.0, f64::INFINITY, 0.5];
     // The growth parameters are not used in the toy model
     let growth_parameters = [1.0, 1.0];
 

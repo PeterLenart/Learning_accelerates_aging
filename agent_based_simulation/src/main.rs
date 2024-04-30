@@ -20,7 +20,7 @@ fn main() {
     // Define toy model parameters
     let aging_parameters = [0.01, 0.1];
     // Hijacking the learning parameters as the improvement parameters for the toy model
-    let learning_parameters = [45.0, f64::INFINITY, 0.2];
+    let learning_parameters = [0.0, f64::INFINITY, 0.5];
     // The growth parameters are not used in the toy model
     let growth_parameters = [1.0, 1.0];
 
@@ -125,14 +125,14 @@ fn main() {
 
     // Define initial distributions for the toy model
     let initial_age_distribution = [20.0, 10.0];
-    let initial_b_distribution = [0.1, 0.0];
-    let mut initial_lmax_distribution = [0.2, 0.0];
+    let mut initial_b_distribution = [0.1, 0.0];
+    let mut initial_lmax_distribution = [0.0, 0.0];
     let initial_gmax_distribution = [1.0, 0.0];
 
     // Define simulation parameters
     let population_cap = 10000;
     let simulation_time : usize = 1000;
-    let replicate_number = 500;
+    let replicate_number = 50;
     let assortative_mating = false;
     let remove_non_reproducing = true;
     let tradeoff = false;
@@ -153,9 +153,9 @@ fn main() {
     // let base_name_part = "plateau_brass_polynomial_different";
     // let base_name_part = "toy_model_constant_fertility_0_10";
     // Name the output file based on the simulation parameters
-    let base_name_part = format!("early_slope_toy_model_step_fertility_{}_{}", learning_parameters[0], learning_parameters[2]);
+    // let base_name_part = format!("early_slope_toy_model_step_fertility_varying_start_and_b_{}_{}", initial_learning_distribution[0], initial_b_distribution[0]);
 
-    // let mut learning_name_part = "with_learning";
+    // // let mut learning_name_part = "with_learning";
     let mut learning_name_part = "with_improvement";
     let mut mating_name_part = "random_mating";
     let mut removal_name_part = "non_reproducing_kept";
@@ -173,18 +173,47 @@ fn main() {
         removal_name_part = "non_reproducing_removed";
     }
 
-    // Run the simulation
-    println!("######################################");
-    println!("###### Simulation with learning ######");
-    println!("######################################");
+    // // Run the simulation
+    // println!("######################################");
+    // println!("###### Simulation with learning ######");
+    // println!("######################################");
 
-    let output_file_name = format!("./simulation_results/toy_model_simulations/{}_{}_{}_{}_{}_{}.csv", base_name_part, mating_name_part, learning_name_part, removal_name_part, tradeoff_name_part,initial_lmax_distribution[0]);
-    let mut wtr = Writer::from_path(output_file_name).unwrap();
+    // let output_file_name = format!("./simulation_results/varying_start/toy_model_simulations/{}_{}_{}_{}_{}_{}.csv", base_name_part, mating_name_part, learning_name_part, removal_name_part, tradeoff_name_part,initial_lmax_distribution[0]);
+    // let mut wtr = Writer::from_path(output_file_name).unwrap();
 
-    for i in 0..replicate_number{
-        println!("Replicate : {}/{}", i+1, replicate_number);
-        run_simulation(&mut wtr, population_cap, simulation_time, i, assortative_mating, &aging_parameters, &learning_parameters, &growth_parameters, initial_age_distribution, initial_b_distribution, initial_lmax_distribution, initial_gmax_distribution, initial_female_proportion, time_step, mutable_b, mutable_lmax, mutable_gmax, b_mutation_rate, lmax_mutation_rate, gmax_mutation_rate, b_mutation_strength, lmax_mutation_strength, gmax_mutation_strength, aging_intermediate_closure, &normalized_male_fertility_closure, &normalized_female_fertility_closure, tradeoff, start_b, remove_non_reproducing, male_menopause, female_menopause)
+    // for i in 0..replicate_number{
+    //     println!("Replicate : {}/{}", i+1, replicate_number);
+    //     run_simulation(&mut wtr, population_cap, simulation_time, i, assortative_mating, &aging_parameters, &learning_parameters, &growth_parameters, initial_age_distribution, initial_b_distribution, initial_lmax_distribution, initial_gmax_distribution, initial_female_proportion, time_step, mutable_b, mutable_lmax, mutable_gmax, b_mutation_rate, lmax_mutation_rate, gmax_mutation_rate, b_mutation_strength, lmax_mutation_strength, gmax_mutation_strength, aging_intermediate_closure, &normalized_male_fertility_closure, &normalized_female_fertility_closure, tradeoff, start_b, remove_non_reproducing, male_menopause, female_menopause)
+    // }
+
+    // Helper function to mimic numpy's linspace
+    fn linspace(start: f64, end: f64, n: usize) -> Vec<f64> {
+        let step = (end - start) / (n - 1) as f64;
+        (0..n).map(|i| start + step * i as f64).collect()
     }
+
+    let mut base_name_part = "";
+    let mut output_file_name = "";
+    start_b_grid = linspace(1e-5, 0.1, 10);
+    start_improvement_grid = linspace(0.0, 60.0, 10);
+
+    for start_b in start_b_grid{
+        for start_improvement in start_improvement_grid{
+            println!("######################################");
+            println!("###### Simulation with b = {} and improvement start = {} ######", start_b, start_improvement);
+            println!("######################################");
+            initial_b_distribution = [start_b, 0.0];
+            initial_learning_distribution = [start_improvement, 0.0];
+
+            base_name_part = format!("early_slope_toy_model_step_fertility_varying_start_and_b_{}_{}", initial_learning_distribution[0], initial_b_distribution[0]);
+            output_file_name = format!("./simulation_results/varying_start/toy_model_simulations/{}_{}_{}_{}_{}_{}.csv", base_name_part, mating_name_part, learning_name_part, removal_name_part, tradeoff_name_part,initial_lmax_distribution[0]);
+
+            let mut wtr = Writer::from_path(output_file_name).unwrap();
+
+            for i in 0..replicate_number{
+                println!("Replicate : {}/{}", i+1, replicate_number);
+                run_simulation(&mut wtr, population_cap, simulation_time, i, assortative_mating, &aging_parameters, &learning_parameters, &growth_parameters, initial_age_distribution, initial_b_distribution, initial_lmax_distribution, initial_gmax_distribution
+
 
     // println!("#########################################");
     // println!("###### Simulation without learning ######");
