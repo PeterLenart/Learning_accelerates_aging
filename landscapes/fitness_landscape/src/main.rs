@@ -30,7 +30,7 @@ fn main() -> Result<(), Box<dyn Error>>{
         1e-5, 
         0.1, 
         0.0, 
-        0.0,
+        60.0,
         dim,
         0.95,
     );
@@ -45,7 +45,7 @@ fn main() -> Result<(), Box<dyn Error>>{
     // Define toy model parameters
     let aging_parameters = [0.01, 0.02];
     // Hijacking the learning parameters as the improvement parameters for the toy model
-    let learning_parameters = [0.0, f64::INFINITY, 0.0];
+    let learning_parameters = [0.0, f64::INFINITY, 0.2];
     // The growth parameters are not used in the toy model
     let growth_parameters = [1.0, 1.0];
 
