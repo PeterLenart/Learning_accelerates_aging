@@ -53,7 +53,7 @@ fn main() {
 
     let female_fertility_parameters = [2.445e-5, 14.8, 32.836];
     let male_fertility_parameters = [2.445e-5, 14.8, 32.836];
-    let male_fertility_parameters = [0.00000978, 14.8, 47.836];
+    // let male_fertility_parameters = [0.00000978, 14.8, 47.836];
 
     let female_fertility_function = fertility_brass_polynomial;
     let male_fertility_function = fertility_brass_polynomial;
@@ -119,7 +119,7 @@ fn main() {
 
     // Define initial distributions
     let initial_age_distribution = [20.0, 10.0];
-    let initial_b_distribution = [0.14, 0.005];
+    let mut initial_b_distribution = [0.14, 0.005];
     let mut initial_lmax_distribution = [0.15, 0.0];
     let mut initial_gmax_distribution = [0.05168141300917714, 0.0]; 
     // let mut initial_gmax_distribution = [0.055, 0.0]
@@ -133,7 +133,7 @@ fn main() {
     // Define simulation parameters
     let population_cap = 10000;
     let simulation_time : usize = 1000;
-    let replicate_number = 100;
+    let replicate_number = 50;
     let assortative_mating = false;
     let remove_non_reproducing = true;
     let tradeoff = false;
@@ -156,8 +156,9 @@ fn main() {
     // Name the output file based on the simulation parameters
     // let base_name_part = format!("early_slope_toy_model_step_fertility_varying_start_and_b_{}_{}", initial_lmax_distribution[0], initial_b_distribution[0]);
 
-    // // let mut learning_name_part = "with_learning";
-    let mut learning_name_part = "with_improvement";
+    // let mut learning_name_part = "no_learning";
+    let mut learning_name_part = "with_learning";
+    // let mut learning_name_part = "with_improvement";
     // let mut learning_name_part = "no_improvement";
     let mut mating_name_part = "random_mating";
     let mut removal_name_part = "non_reproducing_kept";
@@ -220,20 +221,46 @@ fn main() {
     //         }
         // }
 
+    // let start_b_grid = linspace(1e-5, 0.14, 11);
+    // // let start_improvement_grid = linspace(0.0, 60.0, 11);
+    // // let start_lmax_grid = Vec::from([0.0]);
+    // let start_lmax_grid = linspace(0.0, 0.15, 11);
+
+    // for &start_b in start_b_grid.iter(){
+    //     for &start_lmax in start_lmax_grid.iter(){
+    //         println!("######################################");
+    //         println!("###### Simulation with b = {} and lmax = {} ######", start_b, start_lmax);
+    //         println!("######################################");
+    //         initial_b_distribution = [start_b, 0.0];
+    //         initial_lmax_distribution = [start_lmax, 0.0];
+
+    //         let base_name_part = format!("early_slope_equal_fertility_brass_varying_lmax_and_b_{}_{}", initial_lmax_distribution[0], initial_b_distribution[0]);
+    //         let output_file_name = format!("./simulation_results/gla_simulations/lmax_simulations/varying_lmax/{}_{}_{}_{}_{}.csv", base_name_part, mating_name_part, learning_name_part, removal_name_part, tradeoff_name_part);
+
+    //         let mut wtr = Writer::from_path(output_file_name).unwrap();
+
+    //         for i in 0..replicate_number{
+    //             println!("Replicate : {}/{}", i+1, replicate_number);
+    //             run_simulation(&mut wtr, population_cap, simulation_time, i, assortative_mating, &aging_parameters, &learning_parameters, &growth_parameters, initial_age_distribution, initial_b_distribution, initial_lmax_distribution, initial_gmax_distribution, initial_female_proportion, time_step, mutable_b, mutable_lmax, mutable_gmax, b_mutation_rate, lmax_mutation_rate, gmax_mutation_rate, b_mutation_strength, lmax_mutation_strength, gmax_mutation_strength, aging_intermediate_closure, &normalized_male_fertility_closure, &normalized_female_fertility_closure, tradeoff, start_b, remove_non_reproducing, male_menopause, female_menopause)
+    //             }
+    //         }
+    //     }
+
     let start_b_grid = linspace(1e-5, 0.14, 11);
     // let start_improvement_grid = linspace(0.0, 60.0, 11);
-    let start_lmax_grid = Vec::from([0.0]);
+    // let start_gmax_grid = Vec::from([0.0]);
+    let start_gmax_grid = linspace(0.0, 0.055, 11);
 
     for &start_b in start_b_grid.iter(){
-        for &start_lmax in start_lmax_grid.iter(){
+        for &start_gmax in start_gmax_grid.iter(){
             println!("######################################");
-            println!("###### Simulation with b = {} and lmax = {} ######", start_b, start_lmax);
+            println!("###### Simulation with b = {} and gmax = {} ######", start_b, start_gmax);
             println!("######################################");
             initial_b_distribution = [start_b, 0.0];
-            initial_lmax_distribution = [start_lmax, 0.0];
+            initial_gmax_distribution = [start_gmax, 0.0];
 
-            let base_name_part = format!("early_slope_toy_model_step_fertility_varying_lmax_and_b_{}_{}", initial_lmax_distribution[0], initial_b_distribution[0]);
-            let output_file_name = format!("./simulation_results/gla_simulations/lmax_simulations/varying_lmax_no_learning/{}_{}_{}_{}_{}.csv", base_name_part, mating_name_part, learning_name_part, removal_name_part, tradeoff_name_part);
+            let base_name_part = format!("early_slope_equal_fertility_brass_varying_gmax_and_b_{}_{}", initial_gmax_distribution[0], initial_b_distribution[0]);
+            let output_file_name = format!("./simulation_results/gla_simulations/gmax_simulations/varying_gmax/{}_{}_{}_{}_{}.csv", base_name_part, mating_name_part, learning_name_part, removal_name_part, tradeoff_name_part);
 
             let mut wtr = Writer::from_path(output_file_name).unwrap();
 
