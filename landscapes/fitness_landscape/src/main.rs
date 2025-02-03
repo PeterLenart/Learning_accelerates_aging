@@ -45,7 +45,8 @@ fn main() -> Result<(), Box<dyn Error>>{
     // Define toy model parameters
     let aging_parameters = [0.01, 0.02];
     // Hijacking the learning parameters as the improvement parameters for the toy model
-    let learning_parameters = [0.0, f64::INFINITY, 0.2];
+    // let learning_parameters = [0.0, f64::INFINITY, 0.2];
+    let learning_parameters = [0.0, f64::INFINITY, 0.0];
     // The growth parameters are not used in the toy model
     let growth_parameters = [1.0, 1.0];
 
@@ -90,7 +91,7 @@ fn main() -> Result<(), Box<dyn Error>>{
     // let fertility_parameters = [1f64];
     // let fertility_function = constant_fertility;
 
-    let fertility_parameters = [1f64, 15.0, 100.0];
+    let fertility_parameters = [1f64, 25.0, 100.0];
     let fertility_function = step_fertility;
 
     // let fertility_parameters = [0.1f64, 0.1];
@@ -107,7 +108,7 @@ fn main() -> Result<(), Box<dyn Error>>{
     // Save result
     // let output_file_name = "./output/toy_model_landscapes/csv/fitness_40_50.csv";
     // Name the output file based on the parameters
-    let output_file_name = format!("./output/toy_model_landscapes/csv/fitness_{}.csv", learning_parameters[2]);
+    let output_file_name = format!("./output/toy_model_landscapes/csv/fitness_{}_fert_start_{}_no_benefit.csv", learning_parameters[2], fertility_parameters[1]);
 
     // Combine the grid and fitness difference into one array
     let fitness_base_b_reshaped = fitness_base_b.clone().insert_axis(Axis(1));
@@ -136,7 +137,7 @@ fn main() -> Result<(), Box<dyn Error>>{
     // Save result
     // let output_file_name = "./output/toy_model_landscapes/csv/fitness_difference_40_50.csv";
     // Name the output file based on the parameters
-    let output_file_name = format!("./output/toy_model_landscapes/csv/fitness_difference_{}.csv", learning_parameters[2]);
+    let output_file_name = format!("./output/toy_model_landscapes/csv/fitness_difference_{}_fert_start{}_no_benefit.csv", learning_parameters[2], fertility_parameters[1]);
 
     // Combine the grid and fitness difference into one array
     let fitness_difference_reshaped = fitness_difference.insert_axis(Axis(1));
