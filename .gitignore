@@ -50,3 +50,5 @@ runs/
 */simulation_results
 /landscapes/fitness_landscape/target/
 /landscapes/fitness_landscape/output/
+/landscapes/survival_landscape/target/
+/landscapes/survival_landscape/output/
