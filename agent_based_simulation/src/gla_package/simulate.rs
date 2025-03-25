@@ -20,6 +20,8 @@ struct SimulationResult {
     mean_b: f64,
     mean_lmax: f64,
     mean_gmax: f64,
+    // usefull when using the toy model
+    improvement_strength: f64,
     time: f64,
     replicate_id: i32,
 }
@@ -118,6 +120,8 @@ pub fn run_simulation(
             mean_b: b_stats.0,
             mean_lmax: lmax_stats.0,
             mean_gmax: gmax_stats.0,
+            // usefull when using the toy model
+            improvement_strength: learning_parameters[2],
             time: (i as f64) * time_step,
             replicate_id: replicate_id,
         };
