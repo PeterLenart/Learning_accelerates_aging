@@ -1,0 +1,34 @@
+Parameter,Value
+
+initial_female_proportion,0.5
+minimum_mortality,1e-5
+a,0.002759613
+c,0.025201676835511704
+standard_Lmax,0.016067925
+k_learning,39.006865144958745
+n_learning, 0.11060749334680318
+standard_Gmax,0.051681413
+n_growth,0.087651654
+female_fertility_parameters,[2.445e-5; 14.8; 32.836]
+male_fertility_parameters,[2.445e-5; 14.8 ;32.836]
+different_male_fertility_parameters,[0.00000978; 14.8; 47.836]
+initial_age_mean,20
+initial_age_std,10
+initial_b_mean,0.14
+initial_b_std,0.005
+initial_lmax_std,0
+initial_gmax_std,0
+population_cap,10000
+mutable_b,TRUE
+mutable_lmax,FALSE
+mutable_gmax,FALSE
+b_mutation_rate,0.02
+lmax_mutation_rate,0.02
+gmax_mutation_rate,0.02
+b_mutation_strength,0.012
+lmax_mutation_strength,0.012
+gmax_mutation_strength,0.012
+
+toy_model_a, 0.01
+toy_model_mortality_reduction, 0.2
+step_fertility_beggining, 25

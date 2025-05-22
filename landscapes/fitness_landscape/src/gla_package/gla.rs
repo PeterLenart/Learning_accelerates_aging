@@ -124,6 +124,23 @@ pub fn constant_fertility(_x: f64, fertility_parameters: &[f64]) -> f64 {
     let c = fertility_parameters[0];
     c
 }
+/// Calculate the fertility based on an affine fertility model.
+///
+/// # Arguments
+/// * `x` - The age at which to calculate the fertility rate.
+/// * `fertility_parameters` - An array containing the parameters for the affine fertility model:
+///     - `fertility_parameters[0]` (a): The slope of the affine function.
+///     - `fertility_parameters[1]` (b): The intercept of the affine function.
+///
+/// # Returns
+/// Returns the fertility rate at the input `x`, calculated using the provided `a` and `b`.
+pub fn affine_fertility(x: f64, fertility_parameters: &[f64]) -> f64 {
+
+    let (a, b) = (fertility_parameters[0], fertility_parameters[1]);
+
+    (a*x + b).max(0_f64)
+}
+
 
 /// Calculate the fertility based on a step fertility model.
 ///
@@ -151,6 +168,41 @@ pub fn step_fertility(x: f64, fertility_parameters: &[f64]) -> f64 {
     } else {
         if (x >= start) && (x <= end) {
             c
+        } else {
+            0_f64
+        }
+    }
+}
+
+/// Calculate the fertility based on a step fertility model combined with an affine function.
+///
+/// # Arguments
+/// * `x` - The age at which to calculate the fertility rate.
+/// * `fertility_parameters` - An array containing the parameters for the step fertility model:
+///     - `fertility_parameters[0]` (a): The slope of the affine function.
+///     - `fertility_parameters[1]` (b): The intercept of the affine function.
+///     - `fertility_parameters[2]` (start): The age at which fertility begins.
+///     - `fertility_parameters[3]` (end): The age at which fertility ends.
+///
+/// # Returns
+/// Returns the fertility rate at the input `x`, calculated using the provided `c`, `start`, and `end`.
+pub fn step_affine_fertility(x: f64, fertility_parameters: &[f64]) -> f64 {
+    let (a, b, start, end) = (
+        fertility_parameters[0],
+        fertility_parameters[1],
+        fertility_parameters[2],
+        fertility_parameters[3],
+    );
+    let value = (a * x + b).max(0_f64);
+    if end.is_infinite() {
+        if x >= start {
+            value
+        } else {
+            0_f64
+        }
+    } else {
+        if (x >= start) && (x <= end) {
+            value
         } else {
             0_f64
         }

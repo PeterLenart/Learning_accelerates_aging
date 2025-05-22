@@ -157,7 +157,7 @@ pub fn compute_fitness(aging_intermediate_closure: &dyn Fn(f64, &[f64], &[f64], 
     
     // Attempt to find the root using Brent's method
     let mut convergency = SimpleConvergency { eps:1e-15f64, max_iter:100};
-    match find_root_brent(0f64, 0.5_f64, &euler_lotka_closure, &mut convergency) {
+    match find_root_brent(0f64, 1_f64, &euler_lotka_closure, &mut convergency) {
         Ok(root) => return root.max(0.0),
         Err(e) => println!("Failed to find root: {:?}", e),
     }
